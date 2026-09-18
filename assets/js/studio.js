@@ -29,7 +29,7 @@
     video:     { name: 'AI 短视频', chat: '冬季新品投放', ask: '你想做什么样的短视频？', ready: true },
     drama:     { name: 'AI 短剧',   chat: '《雨夜之后》', ask: '你想做一部什么样的短剧？', ready: true },
     education: { name: 'AI 教育',   chat: '新课程',       ask: '你想做哪一门课？' },
-    app:       { name: 'AI App',    chat: '新应用',       ask: '你想做一个什么应用？' }
+    app:       { name: 'AI App',    chat: '团队周报工具', ask: '你想做一个什么应用？', ready: true }
   };
   var mode = new URLSearchParams(location.search).get('mode');
   if (!MODES[mode]) mode = 'video';
@@ -157,7 +157,7 @@
     video: [['clips', '成片'], ['scripts', '脚本'], ['assets', '素材'], ['settings', '设置']],
     drama: [['eps', '剧集'], ['script', '剧本'], ['cast', '角色'], ['settings', '设置']],
     education: [['out', '产出'], ['settings', '设置']],
-    app: [['preview', '预览'], ['settings', '设置']]
+    app: [['preview', '预览'], ['code', '代码'], ['db', '数据库'], ['deploy', '部署']]
   };
   var tabsHost = $('#tabs'), sideBody = $('#sideBody');
   TABS[mode].forEach(function (t, i) {
@@ -277,7 +277,7 @@
   var gateSeen = false;
   function onSend() {
     if (state.running) { state.abort = true; return; }
-    if (!M.ready) { toast('「' + M.name + '」模式的工作台还没做，可以先看 AI 短视频或 AI 短剧'); return; }
+    if (!M.ready) { toast('「' + M.name + '」模式的工作台还没做，可以先看短视频 / 短剧 / AI App'); return; }
     // 未登录：第一次点生成时拦一下，但允许继续看演示
     if (!Auth.isIn() && !gateSeen) {
       gate.classList.add('on');
@@ -1114,6 +1114,453 @@
   })();
 
   /* ============================================================
+     模式四 · AI App（Vibe Coding）
+     ============================================================ */
+  var APP = (function () {
+    var PLAN = [
+      ['页面', '首页 / 写周报 / 团队周报 / 我的'],
+      ['数据模型', 'reports · users · mentions 三张表'],
+      ['关键能力', '@提及、富文本、导出 PDF、邮件周提醒'],
+      ['技术栈', 'Next.js 15 + Postgres + Tailwind']
+    ];
+
+    var FILES = [
+      { p: 'weekly-report/', d: 0, dir: true },
+      { p: 'app/',            d: 1, dir: true },
+      { p: 'page.tsx',              d: 2, f: 'app/page.tsx' },
+      { p: 'reports/page.tsx',      d: 2, f: 'app/reports/page.tsx' },
+      { p: 'api/reports/route.ts',  d: 2, f: 'app/api/reports/route.ts' },
+      { p: 'components/',     d: 1, dir: true },
+      { p: 'ReportCard.tsx',      d: 2, f: 'components/ReportCard.tsx' },
+      { p: 'MentionInput.tsx',    d: 2, f: 'components/MentionInput.tsx' },
+      { p: 'ExportPdfButton.tsx', d: 2, f: 'components/ExportPdfButton.tsx' },
+      { p: 'lib/db.ts',       d: 1, f: 'lib/db.ts' },
+      { p: 'package.json',    d: 1, f: 'package.json' }
+    ];
+
+    var CODE = {
+      'components/ReportCard.tsx':
+        "'use client';\n" +
+        "import { formatWeek } from '@/lib/date';\n" +
+        "import { Avatar } from './Avatar';\n\n" +
+        "type Props = { author: string; week: string; body: string; mentions: string[] };\n\n" +
+        "export function ReportCard({ author, week, body, mentions }: Props) {\n" +
+        "  // 被 @ 到的人会收到一封邮件提醒\n" +
+        "  return (\n" +
+        "    <article className=\"rounded-xl border border-white/10 p-4\">\n" +
+        "      <header className=\"flex items-center gap-2\">\n" +
+        "        <Avatar name={author} />\n" +
+        "        <span className=\"font-medium\">{author}</span>\n" +
+        "        <time className=\"ml-auto text-xs opacity-60\">{formatWeek(week)}</time>\n" +
+        "      </header>\n" +
+        "      <p className=\"mt-2 text-sm leading-relaxed\">{body}</p>\n" +
+        "      {mentions.length > 0 && (\n" +
+        "        <footer className=\"mt-3 flex gap-1\">\n" +
+        "          {mentions.map((m) => (\n" +
+        "            <span key={m} className=\"text-xs text-amber-400\">@{m}</span>\n" +
+        "          ))}\n" +
+        "        </footer>\n" +
+        "      )}\n" +
+        "    </article>\n" +
+        "  );\n" +
+        "}\n",
+      'lib/db.ts':
+        "import { sql } from '@vercel/postgres';\n\n" +
+        "export type Report = {\n" +
+        "  id: string;\n" +
+        "  authorId: string;\n" +
+        "  week: string;\n" +
+        "  body: string;\n" +
+        "};\n\n" +
+        "// 按周拉取团队全部周报，附带作者与被提及的人\n" +
+        "export async function listReports(week: string) {\n" +
+        "  const { rows } = await sql`\n" +
+        "    select r.*, u.name as author\n" +
+        "    from reports r\n" +
+        "    join users u on u.id = r.author_id\n" +
+        "    where r.week = ${week}\n" +
+        "    order by r.created_at desc\n" +
+        "  `;\n" +
+        "  return rows as Report[];\n" +
+        "}\n",
+      'app/api/reports/route.ts':
+        "import { NextResponse } from 'next/server';\n" +
+        "import { listReports } from '@/lib/db';\n\n" +
+        "export async function GET(req: Request) {\n" +
+        "  const week = new URL(req.url).searchParams.get('week');\n" +
+        "  if (!week) {\n" +
+        "    return NextResponse.json({ error: 'week is required' }, { status: 400 });\n" +
+        "  }\n" +
+        "  const reports = await listReports(week);\n" +
+        "  return NextResponse.json({ reports });\n" +
+        "}\n"
+    };
+
+    var TABLES = [
+      { n: 'reports', rows: 128, cols: [['id', 'uuid', 'PK'], ['author_id', 'uuid → users'], ['week', 'text'], ['body', 'text'], ['created_at', 'timestamptz']] },
+      { n: 'users',   rows: 24,  cols: [['id', 'uuid', 'PK'], ['name', 'text'], ['email', 'text'], ['avatar_url', 'text']] },
+      { n: 'mentions', rows: 341, cols: [['id', 'uuid', 'PK'], ['report_id', 'uuid → reports'], ['user_id', 'uuid → users'], ['notified', 'boolean']] }
+    ];
+
+    var s = { stage: 0, file: 'components/ReportCard.tsx', device: 'phone', built: false, deployed: false, log: [] };
+
+    /* 极简高亮：仅用于外观演示 */
+    // 单次分支替换：分两次 replace 会让第二个正则匹配到第一个插进去的标签
+    function hl(src) {
+      var re = /(\/\/[^\n]*)|('[^'\n]*'|"[^"\n]*")|\b(import|from|export|function|const|let|return|type|async|await|new|default|interface|if)\b/g;
+      return esc(src).replace(re, function (m, comment, str, kw) {
+        if (comment) return '<span class="c">' + comment + '</span>';
+        if (str) return '<span class="s">' + str + '</span>';
+        return '<span class="k">' + kw + '</span>';
+      });
+    }
+
+    function renderEmpty(host) {
+      host.innerHTML =
+        '<div class="empty-label" style="margin-top:0">从这些开始 ——</div>' +
+        '<div class="starter-grid">' +
+          '<button class="starter" data-s="report"><div class="ico">📊</div><b>团队周报工具</b><span>能 @人、能导出 PDF</span></button>' +
+          '<button class="starter" data-s="shop"><div class="ico">🧾</div><b>记账小程序</b><span>拍照识别票据，自动归类</span></button>' +
+          '<button class="starter" data-s="crm"><div class="ico">💬</div><b>客服后台</b><span>工单、分配、SLA 看板</span></button>' +
+        '</div>' +
+        '<div class="empty-label">或者从模板开始（点开会把模板 prompt 填进输入框）：</div>' +
+        '<div class="sample-row">' +
+          [['SaaS 后台', '#3F2A12,#1A1208'], ['活动落地页', '#16283F,#0B1220'],
+           ['数据看板', '#2C1840,#140B1E'], ['预约系统', '#12352C,#0A1A16']].map(function (x) {
+            return '<button class="sample"><div class="cov" style="background:linear-gradient(160deg,' + x[1] + ')"></div><div class="nm">' + x[0] + '</div></button>';
+          }).join('') +
+        '</div>';
+      $$('.starter', host).forEach(function (b) {
+        b.addEventListener('click', function () {
+          var k = b.getAttribute('data-s');
+          if (k === 'report') input.value = '做一个团队周报工具，能 @人、能导出 PDF，每周五自动提醒';
+          if (k === 'shop') input.value = '做一个记账小程序，能拍照识别票据并自动归类，月底出报表';
+          if (k === 'crm') input.value = '做一个客服后台，工单分配 + SLA 看板 + 满意度回访';
+          autosize(); input.focus();
+        });
+      });
+      $$('.sample', host).forEach(function (b) {
+        b.addEventListener('click', function () {
+          input.value = '照「' + b.querySelector('.nm').textContent + '」模板做一个，配色用我们的品牌色';
+          autosize(); input.focus();
+        });
+      });
+    }
+
+    function renderParams(host) {
+      host.innerHTML =
+        row('应用类型', ['Web 应用*', '落地页', '内部工具', '小程序']) +
+        row('技术栈', ['Next.js*', 'React + Vite', 'Vue + Nuxt']) +
+        row('数据库', ['Postgres*', 'SQLite', '不需要']) +
+        row('登录方式', ['邮箱*', 'Google', '企业 SSO', '不需要']) +
+        row('部署目标', ['SuperX 托管*', '导出源码', '推到 GitHub']);
+      bindSegs(host);
+    }
+
+    async function run(text) {
+      setRunning(true);
+      userMsg(text);
+      await sleep(500); if (state.abort) return stopped();
+
+      var b = agentBlock();
+      var s1 = addStep(b, '理解需求');
+      await sleep(900); if (state.abort) return stopped();
+      s1.done(3);
+
+      var s2 = addStep(b, '规划页面结构',
+        '<div class="tool"><b>🔧 plan_routes</b></div>' +
+        '<div class="res">→ /（首页） · /new（写周报） · /reports（团队周报） · /me（我的）</div>' +
+        '<div class="tool"><b>🔧 pick_stack</b></div>' +
+        '<div class="res">→ Next.js 15 App Router + Tailwind + Postgres</div>');
+      await sleep(1400); if (state.abort) return stopped();
+      s2.done(9);
+
+      var s3 = addStep(b, '设计数据模型',
+        '<div class="tool"><b>🔧 design_schema</b> tables=3</div>' +
+        '<div class="res">→ reports(id, author_id, week, body, created_at)</div>' +
+        '<div class="res">→ users(id, name, email, avatar_url)</div>' +
+        '<div class="res">→ mentions(id, report_id, user_id, notified)</div>');
+      await sleep(1500); if (state.abort) return stopped();
+      s3.done(12);
+
+      say(b, '我打算这么做：<b>4 个页面 + 3 张表</b>。@提及做成独立的 mentions 表，' +
+             '这样"谁被 @ 了、提醒发没发"可以单独查，以后加邮件提醒不用改结构。');
+
+      renderDb(); tabCount('db', 3);
+      artifactCard(b, '📐', '实现方案',
+        PLAN.map(function (p) {
+          return '<div class="script-line"><b>' + p[0] + '</b><span class="dim">' + p[1] + '</span></div>';
+        }).join(''), 'db');
+
+      await sleep(340);
+      say(b, '方案没问题的话我就开始写了。', 'small');
+      setRunning(false);
+
+      quickReplies(b, [['go', '开始生成', '2 额度'], ['plan', '我要改方案'], ['stack', '换个技术栈']], function (q) {
+        if (q === 'plan') {
+          userMsg('我要改方案');
+          say(agentBlock(), '好，说说改哪块——页面、数据表还是能力？也可以直接在「数据库」Tab 里改表结构，我按新结构重写代码。', 'small');
+          openTab('db', true);
+          return;
+        }
+        if (q === 'stack') {
+          userMsg('换个技术栈');
+          say(agentBlock(), '可选 React + Vite（更轻）或 Vue + Nuxt。在输入框下面的「🎛 参数」里改，改完说「按新栈重来」就行。', 'small');
+          return;
+        }
+        build();
+      });
+    }
+
+    async function build() {
+      userMsg('开始生成');
+      setRunning(true); state.abort = false;
+      await sleep(400);
+
+      var b = agentBlock();
+      var writeable = FILES.filter(function (f) { return f.f; });
+      var card = add(b,
+        '<div class="artifact"><div class="artifact-head">⌨ 正在编写 ' + writeable.length + ' 个文件</div>' +
+        '<div class="artifact-body"><div id="fileWrite"></div>' +
+        '<div class="batch-foot" style="margin-top:10px"><span class="bstat">准备中…</span>' +
+        '<a class="link" href="#" data-open>在工作台查看 →</a></div></div></div>');
+      card.querySelector('[data-open]').addEventListener('click', function (e) { e.preventDefault(); openTab('preview', true); });
+
+      var listHost = $('#fileWrite', card), bstat = $('.bstat', card);
+      s.stage = 0; renderPreview();
+
+      for (var i = 0; i < writeable.length; i++) {
+        if (state.abort) { bstat.textContent = '已停止，已写入的文件保留'; setRunning(false); return; }
+        var f = writeable[i];
+        var lineEl = el('<div class="script-line"><b style="color:var(--accent)">⟳</b>' +
+          '<span class="mono" style="font-size:11.5px">' + f.f + '</span></div>');
+        listHost.appendChild(lineEl); scrollDown();
+        bstat.textContent = '写入 ' + f.f;
+        await sleep(260);
+        lineEl.querySelector('b').textContent = '✓';
+        lineEl.querySelector('b').style.color = 'var(--ok)';
+        s.stage = Math.min(3, Math.floor((i + 1) / writeable.length * 3.99));
+        renderCode(); renderPreview(); tabCount('code', i + 1);
+      }
+
+      bstat.textContent = writeable.length + '/' + writeable.length + ' 已写入';
+      s.built = true;
+
+      await sleep(300);
+      var s4 = addStep(b, '安装依赖并启动',
+        '<div class="tool"><b>$ npm install</b></div>' +
+        '<div class="res">→ added 214 packages in 8s</div>' +
+        '<div class="tool"><b>$ npm run dev</b></div>' +
+        '<div class="res">→ ready on http://localhost:3000</div>');
+      await sleep(1500);
+      s4.done(11);
+
+      s.stage = 3; renderPreview(); renderDeploy();
+
+      report(b, '应用已经跑起来了', [
+        '4 个页面 · 8 个文件 · 3 张表',
+        '已实现：@提及、富文本编辑、导出 PDF、周五邮件提醒',
+        '预览地址：weekly-report.superx.app（临时，部署后换正式域名）',
+        '源码随时可导出，不锁定'
+      ], 2);
+
+      setRunning(false);
+      openTab('preview');
+
+      quickReplies(b, [['deploy', '一键部署', '1 额度'], ['edit', '我还要改'], ['export', '导出源码']], function (q) {
+        if (q === 'export') { toast('正在打包源码…（外观稿未接入）'); return; }
+        if (q === 'edit') {
+          userMsg('把周报列表改成看板，按状态分列');
+          var b2 = agentBlock();
+          say(b2, '这类改动只动一个组件。改完右边预览会直接变，不用重新生成整个应用。', 'small');
+          add(b2, '<div class="tool-call"><span class="sp">✦</span> 改写 components/ReportBoard.tsx <span class="ok">✓</span></div>');
+          toast('外观稿到此为止：真实产品这里会实时重绘预览');
+          return;
+        }
+        deploy();
+      });
+    }
+
+    async function deploy() {
+      userMsg('一键部署');
+      setRunning(true);
+      await sleep(400);
+      var b = agentBlock();
+      openTab('deploy', true);
+
+      var lines = [
+        ['run', '$ superx deploy --prod'],
+        ['', '  正在打包…'],
+        ['', '  ✓ 编译 8 个文件'],
+        ['', '  ✓ 生成静态页 4 个'],
+        ['', '  ✓ 迁移数据库 3 张表'],
+        ['', '  ✓ 绑定域名 weekly-report.superx.app'],
+        ['ok', '  部署完成 · 用时 24s']
+      ];
+      s.log = [];
+      for (var i = 0; i < lines.length; i++) {
+        if (state.abort) break;
+        s.log.push(lines[i]);
+        renderDeploy();
+        await sleep(420);
+      }
+      s.deployed = true;
+      renderDeploy();
+
+      report(b, '已上线', [
+        '地址：https://weekly-report.superx.app',
+        '自定义域名可在「部署」Tab 里绑',
+        '后续每次改动都会自动重新部署'
+      ], 1);
+      setRunning(false);
+    }
+
+    /* ---------- 右栏：预览 ---------- */
+    function renderPreview() {
+      var host = panel('preview');
+      if (!s.stage && !s.built) {
+        host.innerHTML = emptyBox('📱', '还没有应用。<br>说一句你想做什么，预览会出现在这里。');
+        return;
+      }
+      var st = s.stage;
+      host.innerHTML =
+        '<div class="device-bar"><div class="seg2" id="devSeg">' +
+          ['phone', 'tablet', 'desktop'].map(function (d, i) {
+            return '<button data-d="' + d + '" class="' + (s.device === d ? 'on' : '') + '">' +
+              ['手机', '平板', '桌面'][i] + '</button>';
+          }).join('') +
+        '</div><span class="url">🔒 weekly-report.superx.app</span></div>' +
+
+        '<div class="device ' + s.device + '">' +
+          '<div class="chrome"><i></i><i></i><i></i><span class="u">weekly-report.superx.app</span></div>' +
+          '<div class="fake">' +
+            '<div class="fh grow-in"><b>团队周报</b>' + (st >= 2 ? '<span class="btn-x">导出 PDF</span>' : '') + '</div>' +
+            (st >= 1 ? '<div class="weeks grow-in"><span class="on">本周</span><span>上周</span><span>W37</span></div>' : '') +
+            (st >= 1 ? card('Maya', '完成了投放素材的批量生成，成本降到每条 3 元以内。', ['Arga'], '#0B62CE') : '') +
+            (st >= 2 ? card('Arga', '短剧前三集已过审，本周进入 EP04–EP06。', ['Maya', 'Yusuf'], '#12B5C0') : '') +
+            (st >= 3 ? card('Yusuf', '客服工单积压清零，SLA 达标率 98%。', [], '#F59E0B') : '') +
+          '</div>' +
+        '</div>' +
+
+        (s.built ? '<div class="sec-label">本次实现</div>' +
+          '<div class="cast">' +
+            ['@提及', '富文本编辑', '导出 PDF', '周五邮件提醒', '邮箱登录'].map(function (t) {
+              return '<span class="chip" style="height:30px;font-size:12px">' + t + '</span>';
+            }).join('') +
+          '</div>' : '');
+
+      $$('#devSeg button', host).forEach(function (b) {
+        b.addEventListener('click', function () { s.device = b.getAttribute('data-d'); renderPreview(); });
+      });
+    }
+    function card(who, body, ats, color) {
+      return '<div class="card-x grow-in"><div class="who">' +
+        '<span class="ava" style="background:linear-gradient(140deg,' + color + ',#151522)"></span>' +
+        '<b style="font-size:11px">' + who + '</b>' +
+        '<span class="dim" style="margin-left:auto;font-size:10px">W38</span></div>' +
+        '<div style="color:var(--text-2);line-height:1.6">' + body + '</div>' +
+        (ats.length ? '<div style="margin-top:6px" class="mention">' + ats.map(function (a) { return '@' + a; }).join(' ') + '</div>' : '') +
+        '</div>';
+    }
+
+    /* ---------- 右栏：代码 ---------- */
+    function renderCode() {
+      var host = panel('code');
+      if (!s.stage && !s.built) { host.innerHTML = emptyBox('⌨', '还没有代码。'); return; }
+      var written = FILES.filter(function (f) { return f.f; })
+        .slice(0, s.built ? 99 : Math.max(1, Math.round((s.stage + 1) / 4 * 8)))
+        .map(function (f) { return f.f; });
+
+      host.innerHTML =
+        '<div class="code-split"><div class="tree">' +
+          FILES.map(function (f) {
+            var on = f.f === s.file;
+            var pad = 7 + f.d * 13;
+            if (f.dir) return '<button disabled style="padding-left:' + pad + 'px;opacity:.75;cursor:default">📁 ' + f.p + '</button>';
+            var has = written.indexOf(f.f) > -1;
+            return '<button class="' + (on ? 'on' : '') + '" data-f="' + f.f + '" style="padding-left:' + pad + 'px;' +
+              (has ? '' : 'opacity:.35') + '">📄 ' + f.p + (has ? '<span class="new">新增</span>' : '') + '</button>';
+          }).join('') +
+        '</div>' +
+        '<div class="code"><div class="ch">📄 <span class="fn">' + s.file + '</span>' +
+          '<button class="cp" data-act="copy">复制</button></div>' +
+          '<pre>' + (CODE[s.file] ? hl(CODE[s.file]) : '<span class="c">// ' + s.file + ' 的内容在外观稿里没写</span>') + '</pre></div></div>';
+
+      $$('[data-f]', host).forEach(function (b) {
+        b.addEventListener('click', function () { s.file = b.getAttribute('data-f'); renderCode(); });
+      });
+      bindActs(host, { copy: '已复制 ' + s.file });
+    }
+
+    /* ---------- 右栏：数据库 ---------- */
+    function renderDb() {
+      panel('db').innerHTML =
+        '<div class="crumb">Postgres <span class="sep">·</span> weekly_report</div>' +
+        TABLES.map(function (t) {
+          return '<div class="tbl"><div class="th">▤ ' + t.n +
+            '<span class="rows">' + t.rows + ' 行</span></div>' +
+            t.cols.map(function (c) {
+              return '<div class="col"><span class="nm">' + c[0] + (c[2] ? ' <span class="pk">' + c[2] + '</span>' : '') +
+                '</span><span class="ty">' + c[1] + '</span></div>';
+            }).join('') + '</div>';
+        }).join('') +
+        '<div class="hint">💡 表结构可以直接改，改完我会把受影响的代码一起重写——不用你自己去找哪些文件引用了它。</div>';
+    }
+
+    /* ---------- 右栏：部署 ---------- */
+    function renderDeploy() {
+      var host = panel('deploy');
+      if (!s.built) { host.innerHTML = emptyBox('🚀', '应用还没生成。'); return; }
+      host.innerHTML =
+        '<div class="deploy-box">' +
+          (s.deployed
+            ? '<div class="deploy-url"><span class="live"></span>https://weekly-report.superx.app<button class="cp" data-act="copy">复制</button></div>'
+            : '<p class="dim" style="font-size:12.5px;margin-bottom:14px">还没部署。部署后会拿到一个正式地址，后续改动自动重新发布。</p>') +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+            '<button class="sbtn primary" data-act="' + (s.deployed ? 'redeploy' : 'deploy') + '">' +
+              (s.deployed ? '⟳ 重新部署' : '🚀 一键部署 · 1 额度') + '</button>' +
+            '<button class="sbtn" data-act="domain">🌐 自定义域名</button>' +
+          '</div>' +
+          (s.log.length ? '<div class="sec-label">构建日志</div><div class="build-log">' +
+            s.log.map(function (l) { return '<div class="' + l[0] + '">' + esc(l[1]) + '</div>'; }).join('') +
+            '</div>' : '') +
+        '</div>' +
+        '<div class="sec-label">导出</div>' +
+        '<div style="display:grid;gap:8px">' +
+          '<button class="sbtn" data-act="zip">⤓ 下载源码 zip</button>' +
+          '<button class="sbtn" data-act="git">↗ 推到 GitHub 仓库</button>' +
+        '</div>' +
+        '<p class="dim" style="font-size:12px;line-height:1.8;margin-top:12px">' +
+        '源码是标准 Next.js 工程，不含私有运行时，拿走就能自己跑。</p>';
+
+      bindActs(host, {
+        copy: '已复制地址', domain: '绑定自定义域名需要加一条 CNAME 记录',
+        zip: '正在打包源码…（外观稿未接入）', git: '将创建一个新仓库并推送（外观稿未接入）',
+        redeploy: '正在重新部署…（外观稿未接入）'
+      });
+      var dep = host.querySelector('[data-act="deploy"]');
+      if (dep) dep.addEventListener('click', function () { deploy(); });
+    }
+
+    function init() {
+      renderPreview();
+      panel('code').innerHTML = emptyBox('⌨', '还没有代码。');
+      panel('db').innerHTML = emptyBox('▤', '还没有数据表。');
+      panel('deploy').innerHTML = emptyBox('🚀', '应用还没生成。');
+      $('#gridToggle').style.display = 'none';
+    }
+
+    return {
+      init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
+      defaultPrompt: '做一个团队周报工具，能 @人、能导出 PDF，每周五自动提醒',
+      envBadge: '<b>Next.js 15</b><span class="sep">·</span>weekly-report',
+      composerExtra:
+        '<select class="mini-sel" title="生成模型"><option>SuperX Code v3</option><option>v3 Fast</option></select>' +
+        '<select class="mini-sel" title="思考强度"><option>标准</option><option>深度</option></select>'
+    };
+  })();
+
+  /* ============================================================
      未实现的模式
      ============================================================ */
   var TODO = {
@@ -1129,11 +1576,12 @@
         'border:1px solid var(--line);background:rgba(255,255,255,.03);text-align:left">' +
         '<div style="font-size:14px;font-weight:600;margin-bottom:8px">「' + M.name + '」的工作台还没做</div>' +
         '<p class="dim" style="font-size:13px;line-height:1.8">四个模式共用同一套壳（左栏、对话流、输入区、状态规范），' +
-        '只有右栏工作台的 Tab 和控件不同。目前 <b>AI 短视频</b> 和 <b>AI 短剧</b> 两条线已经做完整了，' +
+        '只有右栏工作台的 Tab 和控件不同。目前 <b>AI 短视频</b>、<b>AI 短剧</b> 和 <b>AI App</b> 三条线已经做完整了，' +
         '其余按 <span class="mono">docs/design/05-studio.md</span> 的规格套同一套壳即可。</p>' +
         '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">' +
         '<a href="studio.html?mode=video" class="sbtn primary" style="display:inline-flex;padding:0 16px;height:34px">看 AI 短视频 →</a>' +
         '<a href="studio.html?mode=drama" class="sbtn" style="display:inline-flex;padding:0 16px;height:34px">看 AI 短剧 →</a>' +
+        '<a href="studio.html?mode=app" class="sbtn" style="display:inline-flex;padding:0 16px;height:34px">看 AI App →</a>' +
         '</div></div>';
     },
     run: function () {}
@@ -1173,10 +1621,12 @@
   /* ============================================================
      装配
      ============================================================ */
-  var IMPL = mode === 'video' ? VIDEO : (mode === 'drama' ? DRAMA : TODO);
+  var IMPL = ({ video: VIDEO, drama: DRAMA, app: APP })[mode] || TODO;
   IMPL.renderEmpty($('#emptyBody'));
   IMPL.renderParams($('#params'));
   IMPL.init();
+  if (IMPL.envBadge) { $('#envBadge').innerHTML = IMPL.envBadge; $('#envBadge').hidden = false; }
+  if (IMPL.composerExtra) $('#composerExtra').innerHTML = IMPL.composerExtra;
   openTab(TABS[mode][0][0], false);
 
 })();
