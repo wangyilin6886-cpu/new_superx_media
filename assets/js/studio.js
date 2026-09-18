@@ -47,9 +47,14 @@
 
   $('#navToggle').addEventListener('click', function () {
     if (isNarrow()) document.body.classList.remove('nav-open');
-    else document.body.classList.toggle('nav-collapsed');
+    else { document.body.classList.add('nav-collapsed'); applyWidth(); }
   });
-  $('#navOpen').addEventListener('click', function () { document.body.classList.add('nav-open'); });
+  // 折叠后 .nav 宽度为 0，里面的按钮点不到了，
+  // 所以展开入口必须放在顶栏
+  $('#navOpen').addEventListener('click', function () {
+    if (isNarrow()) document.body.classList.add('nav-open');
+    else { document.body.classList.remove('nav-collapsed'); applyWidth(); }
+  });
   $('#scrim').addEventListener('click', function () { document.body.classList.remove('nav-open'); });
 
   function setSide(open) { document.body.classList.toggle('side-collapsed', !open); }
@@ -60,7 +65,11 @@
     if ((e.metaKey || e.ctrlKey) && e.key === '\\') { e.preventDefault(); setSide(document.body.classList.contains('side-collapsed')); }
   });
 
-  function applyWidth() { $('#navOpen').style.display = isNarrow() ? 'grid' : 'none'; }
+  function applyWidth() {
+    var show = isNarrow() || document.body.classList.contains('nav-collapsed');
+    $('#navOpen').style.display = show ? 'grid' : 'none';
+    $('#navOpen').setAttribute('title', isNarrow() ? '菜单' : '展开侧栏');
+  }
   applyWidth();
   window.addEventListener('resize', applyWidth);
   if (window.innerWidth <= 1024) setSide(false);
@@ -122,23 +131,6 @@
     b.addEventListener('click', function () { location.href = 'studio.html?mode=' + b.getAttribute('data-mode'); });
   });
 
-  // 项目树
-  $$('[data-folder]').forEach(function (f) {
-    f.addEventListener('click', function () {
-      f.classList.toggle('open');
-      var files = f.nextElementSibling;
-      if (files && files.hasAttribute('data-files')) files.hidden = !f.classList.contains('open');
-    });
-  });
-  $$('.chat-item').forEach(function (c) {
-    c.addEventListener('click', function () {
-      $$('.chat-item').forEach(function (x) { x.classList.remove('on'); });
-      c.classList.add('on');
-      $('#chatTitle').textContent = c.querySelector('.t').textContent;
-      if (isNarrow()) document.body.classList.remove('nav-open');
-    });
-  });
-
   // 单选按钮组（参数面板 / 设置 Tab 通用）
   function bindSegs(root) {
     $$('.seg[data-single]', root).forEach(function (seg) {
@@ -148,6 +140,46 @@
         var b = e.target.closest('button'); if (!b) return;
         $$('button', seg).forEach(function (x) { x.classList.remove('on'); });
         b.classList.add('on');
+      });
+    });
+  }
+
+  /* ---------- 左栏：项目与会话（每个模式一套） ---------- */
+  function renderNav(nav) {
+    var host = $('#navTree');
+    host.innerHTML =
+      '<div class="nav-label">项目 <button class="icon-btn" style="width:22px;height:22px" title="新建项目">＋</button></div>' +
+      nav.folders.map(function (f, fi) {
+        return '<button class="tree-folder' + (f.open ? ' open' : '') + '" data-folder>' +
+                 '<span class="tw">▸</span>📁 ' + f.n + '</button>' +
+               '<div data-files' + (f.open ? '' : ' hidden') + '>' +
+                 f.items.map(function (it, ii) {
+                   var on = fi === 0 && ii === 0;
+                   return '<button class="chat-item' + (on ? ' on' : '') + '">' +
+                     '<i class="st-dot ' + (it[2] || 'ok') + '"></i>' +
+                     '<span class="t">' + it[0] + '</span><span class="time">' + it[1] + '</span></button>';
+                 }).join('') +
+               '</div>';
+      }).join('') +
+      '<div class="nav-label">最近</div>' +
+      nav.recent.map(function (r) {
+        return '<button class="chat-item" style="padding-left:8px">' +
+          '<span class="t">' + r[0] + '</span><span class="time">' + r[1] + '</span></button>';
+      }).join('');
+
+    $$('[data-folder]', host).forEach(function (f) {
+      f.addEventListener('click', function () {
+        f.classList.toggle('open');
+        var files = f.nextElementSibling;
+        if (files && files.hasAttribute('data-files')) files.hidden = !f.classList.contains('open');
+      });
+    });
+    $$('.chat-item', host).forEach(function (c) {
+      c.addEventListener('click', function () {
+        $$('.chat-item').forEach(function (x) { x.classList.remove('on'); });
+        c.classList.add('on');
+        $('#chatTitle').textContent = c.querySelector('.t').textContent;
+        if (isNarrow()) document.body.classList.remove('nav-open');
       });
     });
   }
@@ -678,6 +710,14 @@
     }
 
     return { init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
+             nav: {
+               folders: [
+                 { n: '冬季上新', open: true, items: [['冬季新品投放', '09:48'], ['9月批量素材', '昨天']] },
+                 { n: '品牌日常', items: [['门店探店合集', '上周', 'run']] },
+                 { n: '11.11 大促', items: [['预售期素材', '9月2日']] }
+               ],
+               recent: [['小猫测试', '3天前'], ['9.9 大促复盘', '上周']]
+             },
              defaultPrompt: '用这个链接做 5 条投放素材，主打保湿，要痛点式开场',
              composerExtra: modelSelect([
                ['Seedance 2.5', '批量最快'],
@@ -1132,6 +1172,14 @@
     }
 
     return { init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
+             nav: {
+               folders: [
+                 { n: '都市情感系列', open: true, items: [['《雨夜之后》', '09:48'], ['《盛夏未至》', '昨天', 'run']] },
+                 { n: '品牌定制剧', items: [['咖啡品牌 6 集', '上周']] },
+                 { n: '题材试拍', items: [['悬疑短剧试水', '9月2日']] }
+               ],
+               recent: [['竖屏版重剪', '3天前'], ['EP04–EP06 补拍', '上周']]
+             },
              defaultPrompt: '做一部都市情感短剧，落魄总裁重生复仇 + 双向救赎，20 集，竖屏',
              composerExtra: modelSelect([
                ['Kling 3.0', '多语种口型'],
@@ -1584,6 +1632,14 @@
 
     return {
       init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
+      nav: {
+        folders: [
+          { n: '内部工具', open: true, items: [['团队周报工具', '09:48'], ['值班排班表', '昨天']] },
+          { n: '客户项目', items: [['门店预约系统', '上周', 'run']] },
+          { n: '小实验', items: [['记账小程序', '9月2日']] }
+        ],
+        recent: [['活动落地页', '3天前'], ['数据看板', '上周']]
+      },
       defaultPrompt: '做一个团队周报工具，能 @人、能导出 PDF，每周五自动提醒',
       envBadge: '<b>Next.js 15</b><span class="sep">·</span>weekly-report',
       composerExtra:
@@ -1952,6 +2008,14 @@
 
     return {
       init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
+      nav: {
+        folders: [
+          { n: '高一物理 · 力学', open: true, items: [['牛顿第二定律', '09:48'], ['超重与失重', '昨天']] },
+          { n: '期末复习', items: [['力学章节复习课', '上周', 'run']] },
+          { n: '企业内训', items: [['合规基础课', '9月2日']] }
+        ],
+        recent: [['函数图像专题', '3天前'], ['英语时态课', '上周']]
+      },
       defaultPrompt: '做一节《牛顿第二定律》，高一物理，45 分钟，要有实验演示和随堂练习',
       envBadge: '<b>高一物理</b><span class="sep">·</span>力学单元',
       composerExtra: modelSelect([
@@ -1998,6 +2062,7 @@
      装配
      ============================================================ */
   var IMPL = { video: VIDEO, drama: DRAMA, education: EDU, app: APP }[mode];
+  renderNav(IMPL.nav);
   IMPL.renderEmpty($('#emptyBody'));
   IMPL.renderParams($('#params'));
   IMPL.init();
