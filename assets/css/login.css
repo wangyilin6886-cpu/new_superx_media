@@ -157,3 +157,6 @@ body { overflow-y: auto; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+
+.auth-top .lang-switch { height: 30px; font-size: 12.5px; }
+.auth-brand .foot .lang-switch { margin-left: 10px; }
