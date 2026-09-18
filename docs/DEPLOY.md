@@ -50,41 +50,62 @@
 
 ## 三、Cloudflare DNS
 
-域名在 Cloudflare，所以解析在 Cloudflare 改，**不要**动 nameserver。
+**先别急着改。** 域名之前就指向 Vercel 的话，解析记录很可能已经是对的——
+Vercel 给同一个域名分配的 CNAME 目标在同一账号内是稳定的，换项目不一定会变。
 
-进 Cloudflare → 选 `superx-id.com` → **DNS → Records**，先删掉指向旧站的旧记录，然后加：
+正确顺序是：**先在 Vercel 加域名，看它要什么，再决定动不动 Cloudflare。**
 
-| 类型 | 名称 | 内容 | 代理状态 |
-|---|---|---|---|
-| A | `@` | `76.76.21.21` | **DNS only（灰云）** |
-| CNAME | `www` | `cname.vercel-dns.com` | **DNS only（灰云）** |
+### 当前记录（2026-09 实际状态）
 
-> Vercel 在添加域名时会显示它当前要求的具体记录值，**以 Vercel 页面上显示的为准**——
-> 上面这两个值是 Vercel 目前的标准值，但它偶尔会调整。
+| 类型 | 名称 | 内容 | 代理 | 归属 |
+|---|---|---|---|---|
+| CNAME | `superx-id.com` | `a680b520c8a239fe.vercel-dns-017.com` | DNS only | **网站** |
+| CNAME | `www` | `a680b520c8a239fe.vercel-dns-017.com` | DNS only | **网站** |
+| MX ×3 | `superx-id.com` | `mx.zoho.com` / `mx2` / `mx3` | DNS only | 邮箱 |
+| TXT | `superx-id.com` | `v=spf1 include:one.zoho.com ~all` | DNS only | 邮箱 |
+| TXT | `superx-id.com` | `zoho-verification=…` | DNS only | 邮箱 |
+| TXT | `230110336._domainkey` / `zc915539326._domainkey` | DKIM 公钥 | DNS only | 邮箱 |
+
+### ⚠️ 只有前两条 CNAME 跟网站有关
+
+**MX 和 TXT 全是 Zoho 邮箱的**（收信、SPF 反垃圾、DKIM 签名、域名验证）。
+删掉任何一条，`@superx-id.com` 的邮件就会开始丢或被判垃圾。换站点的时候**一条都不要碰**。
+
+### Vercel 的 CNAME 有两种形态
+
+- 旧的通用值：`cname.vercel-dns.com`
+- 现在的按域名分配值：`<一串哈希>.vercel-dns-017.com` ← 你用的是这种
+
+**以 Vercel 项目 Settings → Domains 里显示的为准。** 如果它显示的值和现在这条一样，
+Cloudflare 什么都不用改；不一样就只改这两条 CNAME 的 Content，代理状态保持灰云。
 
 ### 代理状态必须是灰云
 
-这是这套组合最容易踩的坑。橙云（Proxied）意味着 Cloudflare 代理流量，会导致：
+Cloudflare 顶部会一直提示 "Proxying is required for most security and performance
+features"，**忽略它**。橙云（Proxied）会导致：
 
 - Vercel 签不出证书（它需要直接验证域名归属）
-- 或者签出来了，但 Cloudflare 边缘和 Vercel 之间证书不匹配，浏览器报错
+- 或者签出来了，但 Cloudflare 边缘和 Vercel 之间证书不匹配
 - 最典型的表现是 **ERR_TOO_MANY_REDIRECTS**（重定向循环）
 
-**灰云就好了**——DNS 解析照常走 Cloudflare，HTTPS 由 Vercel 自己签发和续期，Vercel 本身
-就在全球 CDN 上，不缺 Cloudflare 这一层加速。
+灰云不影响解析走 Cloudflare，HTTPS 由 Vercel 自己签发和续期，Vercel 本身就在全球 CDN 上。
 
 如果你确实要开橙云（比如想用 Cloudflare 的 WAF），那么 Cloudflare 的
 **SSL/TLS → Overview** 必须设成 **Full (strict)**，绝不能是 Flexible——Flexible 就是
 上面那个重定向循环的根源。
 
----
+> 顺带一提：apex（`superx-id.com`）上挂 CNAME 本来不合 DNS 规范，能用是因为
+> Cloudflare 做了 CNAME flattening。这是 Cloudflare 的特性，换别家 DNS 要改用 A 记录。
 
 ## 四、在 Vercel 绑定域名
 
 1. 新项目 → **Settings → Domains**
 2. 加 `superx-id.com`，再加 `www.superx-id.com`
-3. Vercel 会自动把其中一个设为主域、另一个 301 跳过去（默认 apex 为主）
-4. 等状态从 "Invalid Configuration" 变成 **Valid**，证书自动签发
+3. **看 Vercel 怎么说**：
+   - 显示 **Valid Configuration** → Cloudflare 一个字都不用改，证书会自动签发
+   - 显示 **Invalid Configuration** → 它会给出期望的 CNAME 值，把 Cloudflare 里那
+     两条 CNAME 的 Content 改成它给的值（代理状态保持灰云），等一两分钟自动复检
+4. Vercel 会自动把其中一个设为主域、另一个 301 跳过去（默认 apex 为主）
 
 DNS 生效通常几分钟内，偶尔要等到 TTL 过期。查进度：
 
