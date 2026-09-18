@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SuperX Studio</title>
+<meta name="description" content="SuperX 创作工作台 · AI 短视频">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/studio.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='5' transform='rotate(45 16 16)' fill='%23FF5A6E'/></svg>">
+</head>
+<body data-mode="video">
+
+<div class="scrim" id="scrim"></div>
+
+<div class="app">
+
+  <!-- ============ 左栏 ============ -->
+  <aside class="nav" id="nav">
+    <div class="nav-head">
+      <a href="index.html" class="logo"><span class="mark"></span>SuperX</a>
+      <div style="flex:1"></div>
+      <button class="icon-btn" id="navToggle" aria-label="折叠侧栏" title="折叠侧栏">⊟</button>
+    </div>
+
+    <div class="nav-body">
+      <button class="new-chat" id="newChat">
+        <span style="color:var(--accent)">✦</span> 新建创作
+        <span class="caret">▾</span>
+      </button>
+      <div class="mode-menu" id="modeMenu">
+        <button data-mode="video"><i class="dot" style="background:#FF5A6E"></i><span>AI 短视频<span class="sub">批量出片</span></span></button>
+        <button data-mode="drama"><i class="dot" style="background:#A855F7"></i><span>AI 短剧<span class="sub">剧本到成片</span></span></button>
+        <button data-mode="education"><i class="dot" style="background:#34D399"></i><span>AI 教育<span class="sub">课件 + 讲课视频</span></span></button>
+        <button data-mode="app"><i class="dot" style="background:#F59E0B"></i><span>AI App<span class="sub">Vibe Coding</span></span></button>
+      </div>
+
+      <div class="nav-label">项目 <button class="icon-btn" style="width:22px;height:22px" title="新建项目">＋</button></div>
+      <button class="tree-folder open" data-folder><span class="tw">▸</span>📁 未命名项目</button>
+      <div data-files>
+        <button class="chat-item on"><span class="t">冬季新品投放</span><span class="time">09:48</span></button>
+        <button class="chat-item"><span class="t">9月批量素材</span><span class="time">昨天</span></button>
+      </div>
+      <button class="tree-folder" data-folder><span class="tw">▸</span>📁 品牌日常</button>
+      <div data-files hidden>
+        <button class="chat-item"><span class="t">门店探店合集</span><span class="time">上周</span></button>
+      </div>
+      <button class="tree-folder" data-folder><span class="tw">▸</span>📁 双十一</button>
+      <div data-files hidden>
+        <button class="chat-item"><span class="t">预售期素材</span><span class="time">9月2日</span></button>
+      </div>
+
+      <div class="nav-label">最近</div>
+      <button class="chat-item" style="padding-left:8px"><span class="t">小猫测试</span><span class="time">3天前</span></button>
+      <button class="chat-item" style="padding-left:8px"><span class="t">618 复盘</span><span class="time">上周</span></button>
+
+      <div style="margin-top:18px">
+        <a class="back-site" href="index.html">← 返回官网</a>
+      </div>
+    </div>
+
+    <div class="nav-foot">
+      <div class="user-row">
+        <div class="avatar"></div>
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:500">张某某</div>
+          <div class="dim" style="font-size:11px">免费版 · 12/20 额度</div>
+        </div>
+      </div>
+      <div class="quota"><i></i></div>
+      <button class="upgrade">🚀 升级到创作者</button>
+    </div>
+  </aside>
+
+  <!-- ============ 中栏 ============ -->
+  <main class="main">
+    <header class="top">
+      <button class="icon-btn hide-lg" id="navOpen" aria-label="菜单" style="display:none">☰</button>
+      <span class="mode-dot"></span>
+      <span class="title" id="chatTitle">冬季新品投放</span>
+      <button class="icon-btn" style="width:24px;height:24px;font-size:12px" title="重命名">✎</button>
+      <span class="spacer"></span>
+      <span class="credits hide-sm"><span style="color:var(--accent)">⚡</span> <b>128</b> 额度</span>
+      <button class="top-btn hide-sm">↗ 分享</button>
+      <button class="top-btn" id="sideToggle" title="显示/隐藏工作台">⊞<span class="lb"> 工作台</span></button>
+    </header>
+
+    <div class="thread" id="thread">
+      <!-- 空状态 -->
+      <div class="empty" id="empty">
+        <div class="dot-title"><i></i>你想做什么样的短视频？</div>
+
+        <div class="empty-label" style="margin-top:0">从这些开始 ——</div>
+        <div class="starter-grid">
+          <button class="starter" data-starter="link">
+            <div class="ico">🔗</div>
+            <b>商品链接出片</b>
+            <span>粘贴淘宝 / 京东 / 抖音小店链接</span>
+          </button>
+          <button class="starter" data-starter="copy">
+            <div class="ico">📝</div>
+            <b>一段文案出片</b>
+            <span>已经写好卖点了，直接排片</span>
+          </button>
+          <button class="starter" data-starter="ref">
+            <div class="ico">🎯</div>
+            <b>竞品同款</b>
+            <span>发一条参考视频，做同结构的</span>
+          </button>
+        </div>
+
+        <div class="empty-label">或者看看别人怎么做的（点开能看到完整对话，含原始 prompt）：</div>
+        <div class="sample-row">
+          <button class="sample" data-sample="美妆">
+            <div class="cov" style="background:linear-gradient(160deg,#4A1A24,#170C12)"></div>
+            <div class="nm">美妆 · 成本 -72%</div>
+          </button>
+          <button class="sample" data-sample="3C">
+            <div class="cov" style="background:linear-gradient(160deg,#16283F,#0B1220)"></div>
+            <div class="nm">3C · 测评式</div>
+          </button>
+          <button class="sample" data-sample="食品">
+            <div class="cov" style="background:linear-gradient(160deg,#3F2A12,#1A1208)"></div>
+            <div class="nm">食品 · 口播</div>
+          </button>
+          <button class="sample" data-sample="服饰">
+            <div class="cov" style="background:linear-gradient(160deg,#2C1840,#140B1E)"></div>
+            <div class="nm">服饰 · 穿搭</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 对话流由 JS 注入 -->
+      <div class="thread-inner" id="threadInner" hidden></div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="params" id="params">
+        <div class="prow"><span>平台</span><div class="seg" data-single><button class="on">抖音</button><button>视频号</button><button>小红书</button><button>TikTok</button></div></div>
+        <div class="prow"><span>时长</span><div class="seg" data-single><button>15s</button><button class="on">15–30s</button><button>60s</button></div></div>
+        <div class="prow"><span>口播风格</span><div class="seg" data-single><button class="on">痛点式</button><button>测评式</button><button>故事式</button><button>对比式</button><button>清单式</button></div></div>
+        <div class="prow"><span>音色</span><div class="seg" data-single><button class="on">温柔女声</button><button>活力女声</button><button>沉稳男声</button><button>克隆我的声音</button></div></div>
+        <div class="prow"><span>批量</span><div class="seg" data-single><button>3 条</button><button class="on">5 条</button><button>10 条</button><button>30 条</button></div></div>
+      </div>
+
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="告诉 SuperX 你要什么…"></textarea>
+        <div class="chips" id="chips"></div>
+        <div class="composer-bar">
+          <button class="cbtn" id="addBtn">⊕<span class="lb"> 添加</span></button>
+          <button class="cbtn" id="atBtn">@<span class="lb"> 引用</span></button>
+          <button class="cbtn" id="paramBtn">🎛<span class="lb"> 参数</span></button>
+          <span class="sp"></span>
+          <select class="mode-select" id="runMode" title="执行模式">
+            <option value="step">逐步确认</option>
+            <option value="auto">自动执行</option>
+            <option value="plan">只出方案</option>
+          </select>
+          <button class="send" id="send" aria-label="发送">↑</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ 右栏工作台 ============ -->
+  <aside class="side" id="side">
+    <div class="side-top">
+      <button class="tab on" data-tab="clips">成片<span class="n" id="clipCount"></span></button>
+      <button class="tab" data-tab="scripts">脚本<span class="n" id="scriptCount"></span></button>
+      <button class="tab" data-tab="assets">素材</button>
+      <button class="tab" data-tab="settings">设置</button>
+      <span class="sp"></span>
+      <button class="icon-btn" id="gridToggle" title="网格 / 单条">⊞</button>
+      <button class="icon-btn" id="sideClose" title="收起工作台">⊟</button>
+    </div>
+
+    <div class="side-body">
+      <div class="panel on" data-panel="clips" id="panelClips">
+        <div class="side-empty">
+          <div>
+            <div class="ic">🎬</div>
+            <p>还没有成片。<br>在左边说一句你要什么，产出会出现在这里。</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel" data-panel="scripts" id="panelScripts"></div>
+      <div class="panel" data-panel="assets" id="panelAssets"></div>
+      <div class="panel" data-panel="settings" id="panelSettings"></div>
+    </div>
+  </aside>
+
+</div>
+
+<button class="side-handle" id="sideOpen" title="展开工作台">◀</button>
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/studio.js"></script>
+</body>
+</html>

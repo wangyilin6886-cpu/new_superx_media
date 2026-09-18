@@ -18,10 +18,23 @@ npx http-server . -p 8080
 ## 文件结构
 
 ```
-index.html              首页全部 12 屏
-assets/css/styles.css   设计系统（色板/字体/组件）+ 各屏样式 + 响应式
-assets/js/main.js       交互：滚动进场、数字滚动、Tab、胶片条、打字机、定价切换等
+index.html              官网首页，12 屏
+studio.html             创作工作台（AI 短视频模式）
+assets/css/styles.css   官网设计系统 + 各屏样式 + 响应式
+assets/css/studio.css   工作台设计系统（密度更高）+ 三栏布局
+assets/js/main.js       官网交互
+assets/js/studio.js     工作台交互 + 演示流程 + 假数据
 docs/design/            设计稿（plaintext 线框），实现以此为准
+```
+
+## 两个页面怎么串起来
+
+```
+index.html  ──「免费开始创作」────────▶  studio.html
+            ──「开始做短视频」────────▶  studio.html?mode=video
+            ──「开始做短剧」──────────▶  studio.html?mode=drama    （提示未实现）
+            ──「开始做课程 / 应用」───▶  studio.html?mode=education / app
+studio.html ──「← 返回官网」──────────▶  index.html
 ```
 
 ## 12 屏对照
@@ -60,9 +73,28 @@ docs/design/            设计稿（plaintext 线框），实现以此为准
 成片缩略图、剧照、课件页、App 界面、案例封面、客户 Logo、团队头像。
 接入真实素材时替换对应元素即可，尺寸与位置已按设计稿定好。
 
+## 创作工作台（studio.html）
+
+按 `docs/design/05-studio.md` 实现，三栏：左导航 / 中对话流 / 右工作台。
+本次只做了 **AI 短视频** 模式的完整流程，其余三个模式进入后会说明未实现。
+
+跑一遍演示：打开 `studio.html` → 点「商品链接出片」→ 点发送 → 等 agent 跑完
+→ 点「5 版全出」。会依次看到：
+
+- 折叠的 agent 步骤行（点开有工具调用明细）
+- 脚本产物卡（点击跳到右栏「脚本」Tab）
+- 带额度标注的快捷回复
+- 5 条并行生成的进度格子，第 ④ 条**故意失败**，演示失败态
+- 完成汇报 + 额度消耗
+- 右栏工作台：9:16 预览（可播放，字幕跟随分镜切换）、分镜选择、
+  镜头明细、其他成片切换、`⊞` 网格模式（多选批量下载）
+
+快捷键：`⌘\` / `Ctrl+\` 开关右栏工作台。
+
 ## 尚未实现（设计稿里有，本次未做）
 
 - 四个产品子页面 `/video` `/drama` `/education` `/app`
-  （首页产品卡与「了解更多」目前指向首页内对应分区 / `#cta`）
+  （首页每条产品线的「了解更多」目前指向 `#cta` 占位）
+- 工作台的短剧 / 教育 / AI App 三个模式
 - `/about` `/pricing` `/cases` `/contact` 等二级页面
-- 所有表单、登录、视频 Modal 均为占位，不发请求
+- 所有表单、登录、下载、视频 Modal 均为占位，不发请求
