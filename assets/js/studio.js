@@ -28,7 +28,7 @@
   var MODES = {
     video:     { name: 'AI 短视频', chat: '冬季新品投放', ask: '你想做什么样的短视频？', ready: true },
     drama:     { name: 'AI 短剧',   chat: '《雨夜之后》', ask: '你想做一部什么样的短剧？', ready: true },
-    education: { name: 'AI 教育',   chat: '新课程',       ask: '你想做哪一门课？' },
+    education: { name: 'AI 教育',   chat: '牛顿第二定律', ask: '你想做哪一门课？', ready: true },
     app:       { name: 'AI App',    chat: '团队周报工具', ask: '你想做一个什么应用？', ready: true }
   };
   var mode = new URLSearchParams(location.search).get('mode');
@@ -156,7 +156,7 @@
   var TABS = {
     video: [['clips', '成片'], ['scripts', '脚本'], ['assets', '素材'], ['settings', '设置']],
     drama: [['eps', '剧集'], ['script', '剧本'], ['cast', '角色'], ['settings', '设置']],
-    education: [['out', '产出'], ['settings', '设置']],
+    education: [['deck', '课件'], ['video', '讲课视频'], ['quiz', '练习题'], ['settings', '设置']],
     app: [['preview', '预览'], ['code', '代码'], ['db', '数据库'], ['deploy', '部署']]
   };
   var tabsHost = $('#tabs'), sideBody = $('#sideBody');
@@ -1597,31 +1597,371 @@
   })();
 
   /* ============================================================
-     未实现的模式
+     模式三 · AI 教育
      ============================================================ */
-  var TODO = {
-    defaultPrompt: '',
-    init: function () {
-      TABS[mode].forEach(function (t) { panel(t[0]).innerHTML = emptyBox('🚧', '这个模式的工作台还没做。'); });
-      $('#gridToggle').style.display = 'none';
-    },
-    renderParams: function (host) { host.innerHTML = '<p class="dim" style="font-size:12.5px">该模式的参数面板还没做。</p>'; },
-    renderEmpty: function (host) {
+  var EDU = (function () {
+    var COURSE = '牛顿第二定律';
+    var POINTS = [
+      ['力与加速度成正比', 1], ['质量与加速度成反比', 1], ['F = ma 的矢量性', 1],
+      ['国际单位制与量纲', 0], ['受力分析的顺序', 0], ['常见误区：惯性不是力', 0],
+      ['连接体问题', 0], ['超重与失重', 0]
+    ];
+
+    var SLIDES = [
+      { k: '导入', t: '为什么推不动一堵墙', b: ['同样的力，推购物车和推墙结果不同', '差别在哪里？先记下你的猜想'], f: '演示视频：推车 vs 推墙' },
+      { k: '实验', t: '控制变量：先固定质量', b: ['保持小车质量不变', '逐次增大拉力，测量加速度', '记录 5 组数据'], f: '实验装置示意图' },
+      { k: '结论一', t: '力越大，加速度越大', b: ['a 与 F 成正比', '图像是一条过原点的直线'], f: 'a–F 图像' },
+      { k: '结论二', t: '质量越大，加速度越小', b: ['保持拉力不变，增加配重', 'a 与 m 成反比'], f: 'a–1/m 图像' },
+      { k: '公式', t: '牛顿第二定律', b: ['合力决定加速度，方向相同', '单位：1 N = 1 kg·m/s²'], f: 'F = m · a', board: true },
+      { k: '误区', t: '惯性不是一种力', b: ['惯性是属性，不是受力', '匀速直线运动不需要力维持'], f: '错题示例' }
+    ];
+
+    var TUTORS = [
+      { n: 'Bu Sari', v: '亲和女声', c: '#34D399' },
+      { n: 'Pak Andi', v: '沉稳男声', c: '#0B62CE' },
+      { n: 'Aria', v: '英文女声', c: '#A855F7' },
+      { n: 'Rian', v: '活力男声', c: '#F59E0B' }
+    ];
+
+    var QUIZ = [
+      { t: '单选', q: '质量不变时，合力增大一倍，加速度将', o: ['减半', '不变', '增大一倍', '增大三倍'], a: 2,
+        w: '由 a = F/m，m 不变时 a 与 F 成正比，所以 F 翻倍则 a 翻倍。' },
+      { t: '判断', q: '物体不受力时一定静止', o: ['正确', '错误'], a: 1,
+        w: '不受力时保持原有运动状态：原来静止则静止，原来匀速则继续匀速。' },
+      { t: '计算', q: '求 2 kg 物体在 6 N 合力下的加速度', o: ['1 m/s²', '3 m/s²', '12 m/s²'], a: 1,
+        w: 'a = F/m = 6 N ÷ 2 kg = 3 m/s²，方向与合力相同。' }
+    ];
+
+    var s = { built: false, slide: 0, tutor: 0, playing: false, t: 0, dur: 520 };
+
+    function renderEmpty(host) {
       host.innerHTML =
-        '<div style="max-width:560px;margin:0 auto;padding:22px;border-radius:14px;' +
-        'border:1px solid var(--line);background:rgba(255,255,255,.03);text-align:left">' +
-        '<div style="font-size:14px;font-weight:600;margin-bottom:8px">「' + M.name + '」的工作台还没做</div>' +
-        '<p class="dim" style="font-size:13px;line-height:1.8">四个模式共用同一套壳（左栏、对话流、输入区、状态规范），' +
-        '只有右栏工作台的 Tab 和控件不同。目前 <b>AI 短视频</b>、<b>AI 短剧</b> 和 <b>AI App</b> 三条线已经做完整了，' +
-        '其余按 <span class="mono">docs/design/05-studio.md</span> 的规格套同一套壳即可。</p>' +
-        '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">' +
-        '<a href="studio.html?mode=video" class="sbtn primary" style="display:inline-flex;padding:0 16px;height:34px">看 AI 短视频 →</a>' +
-        '<a href="studio.html?mode=drama" class="sbtn" style="display:inline-flex;padding:0 16px;height:34px">看 AI 短剧 →</a>' +
-        '<a href="studio.html?mode=app" class="sbtn" style="display:inline-flex;padding:0 16px;height:34px">看 AI App →</a>' +
-        '</div></div>';
-    },
-    run: function () {}
-  };
+        '<div class="empty-label" style="margin-top:0">从这些开始 ——</div>' +
+        '<div class="starter-grid">' +
+          '<button class="starter" data-s="outline"><div class="ico">📋</div><b>上传课程大纲</b><span>一份大纲出一整门课</span></button>' +
+          '<button class="starter" data-s="book"><div class="ico">📚</div><b>上传教材或 PPT</b><span>PPT / Word / PDF 都行</span></button>' +
+          '<button class="starter" data-s="topic"><div class="ico">🎯</div><b>只给一个知识点</b><span>我来补完整节课</span></button>' +
+        '</div>' +
+        '<div class="empty-label">或者看看已经做出来的（点开能看到完整对话，含原始 prompt）：</div>' +
+        '<div class="sample-row">' +
+          [['高中物理 · 力学', '#12352C,#0A1A16'], ['初中数学 · 函数', '#16283F,#0B1220'],
+           ['企业内训 · 合规', '#3F2A12,#1A1208'], ['英语 · 时态', '#2C1840,#140B1E']].map(function (x) {
+            return '<button class="sample"><div class="cov" style="background:linear-gradient(160deg,' + x[1] + ')"></div><div class="nm">' + x[0] + '</div></button>';
+          }).join('') +
+        '</div>';
+      $$('.starter', host).forEach(function (b) {
+        b.addEventListener('click', function () {
+          var k = b.getAttribute('data-s');
+          if (k === 'outline') { addChip('📋 力学单元大纲.docx'); input.value = '按这份大纲做一节 45 分钟的课，高一物理'; }
+          if (k === 'book') { addChip('📚 人教版必修一.pdf'); input.value = '用教材第四章做一节课，课件 + 讲课视频 + 随堂练习'; }
+          if (k === 'topic') input.value = '做一节《牛顿第二定律》，高一物理，45 分钟，要有实验演示和随堂练习';
+          autosize(); input.focus();
+        });
+      });
+      $$('.sample', host).forEach(function (b) {
+        b.addEventListener('click', function () { toast('样例：完整对话记录 + 原始 prompt（外观稿未接入）'); });
+      });
+    }
+
+    function renderParams(host) {
+      host.innerHTML =
+        row('学段', ['高中*', '初中', '小学', '高校', '企业内训']) +
+        row('课时', ['20 分钟', '45 分钟*', '90 分钟']) +
+        row('讲师', ['Bu Sari*', 'Pak Andi', 'Aria', '克隆我自己']) +
+        row('难度', ['基础', '标准*', '拔高']) +
+        row('导出', ['PPTX + MP4*', '仅课件', '仅视频', 'SCORM 包']);
+      bindSegs(host);
+    }
+
+    async function run(text, attach) {
+      setRunning(true);
+      userMsg(text, attach);
+      await sleep(500); if (state.abort) return stopped();
+
+      var b = agentBlock();
+      var s1 = addStep(b, '理解教学目标');
+      await sleep(900); if (state.abort) return stopped();
+      s1.done(4);
+
+      var s2 = addStep(b, '解析教材与大纲',
+        '<div class="tool"><b>🔧 parse_material</b> 人教版必修一 · 第四章</div>' +
+        '<div class="res">→ 提取 8 个知识点、3 个实验、12 道例题</div>' +
+        '<div class="tool"><b>🔧 build_knowledge_graph</b></div>' +
+        '<div class="res">→ 标出 3 个核心知识点与它们的前置依赖</div>');
+      await sleep(1500); if (state.abort) return stopped();
+      s2.done(14);
+
+      var s3 = addStep(b, '编排课件与讲稿',
+        '<div class="tool"><b>🔧 build_deck</b> slides=24 duration=45min</div>' +
+        '<div class="res">→ 导入 → 实验 → 两条结论 → 公式 → 误区 → 小结 → 练习</div>' +
+        '<div class="tool"><b>🔧 write_narration</b></div>' +
+        '<div class="res">→ 逐页讲稿，含停顿、板书时机与提问点</div>');
+      await sleep(1600); if (state.abort) return stopped();
+      s3.done(19);
+
+      say(b, '这节课我按<b>「先实验、后公式」</b>的顺序排：先让学生看到推车和推墙的差别，' +
+             '再用控制变量做两组实验，最后才给出 F = ma。这样公式是结论，不是要背的前提。');
+
+      renderDeck(true);
+      artifactCard(b, '🗺', '知识点图谱 · 8 个',
+        '<div class="kmap">' + POINTS.map(function (p) {
+          return '<span class="' + (p[1] ? 'core' : '') + '">' + p[0] + '</span>';
+        }).join('') + '</div>', 'deck');
+
+      await sleep(340);
+      say(b, '课件大纲 24 页已经排好。要我直接出整节课（课件 + 讲课视频 + 练习题），还是先改大纲？', 'small');
+      setRunning(false);
+
+      quickReplies(b, [['all', '出整节课', '2 额度'], ['deck', '只要课件', '1 额度'], ['edit', '我要改大纲']], function (q) {
+        if (q === 'edit') {
+          userMsg('我要改大纲');
+          say(agentBlock(), '好，课件在右边「课件」Tab，逐页可改。调整顺序或增删页面后告诉我，讲稿和练习题会跟着重写。', 'small');
+          openTab('deck', true);
+          return;
+        }
+        generate(q === 'all');
+      });
+    }
+
+    async function generate(full) {
+      userMsg(full ? '出整节课' : '只要课件');
+      setRunning(true); state.abort = false;
+      await sleep(400);
+
+      var b = agentBlock();
+      var model = currentModel();
+      var jobs = full
+        ? [['📊', '课件 24 页', 'deck'], ['🎬', '讲课视频 08:40', 'video'], ['📝', '随堂练习 3 题', 'quiz']]
+        : [['📊', '课件 24 页', 'deck']];
+
+      var card = add(b,
+        '<div class="artifact"><div class="artifact-head">📚 正在生成' + (full ? '三样产物' : '课件') + '</div>' +
+        '<div class="artifact-body"><div id="eduJobs"></div>' +
+        '<div class="batch-foot" style="margin-top:10px"><span class="bstat">准备中…</span>' +
+        '<a class="link" href="#" data-open>在工作台查看 →</a></div></div></div>');
+      card.querySelector('[data-open]').addEventListener('click', function (e) { e.preventDefault(); openTab('deck', true); });
+
+      var host = $('#eduJobs', card), bstat = $('.bstat', card);
+      var phases = {
+        deck: ['排版页面', '生成配图', '统一样式'],
+        video: ['驱动讲师形象', '合成语音', '对口型', '课件切换'],
+        quiz: ['挑知识点', '生成题干', '写解析']
+      };
+
+      for (var i = 0; i < jobs.length; i++) {
+        if (state.abort) { bstat.textContent = '已停止，已完成的保留'; setRunning(false); return; }
+        var j = jobs[i];
+        var line = el('<div class="script-line"><b style="color:var(--accent)">⟳</b>' +
+          '<span>' + j[0] + ' ' + j[1] + '</span></div>');
+        host.appendChild(line); scrollDown();
+        var ph = phases[j[2]];
+        for (var p = 0; p < ph.length; p++) {
+          if (state.abort) break;
+          bstat.textContent = j[1] + ' · ' + ph[p] + (j[2] === 'video' ? '（' + model + '）' : '');
+          await sleep(420);
+        }
+        line.querySelector('b').textContent = '✓';
+        line.querySelector('b').style.color = 'var(--ok)';
+        if (j[2] === 'deck') { s.built = true; renderDeck(); tabCount('deck', 24); }
+        if (j[2] === 'video') { renderVideo(); tabCount('video', ''); }
+        if (j[2] === 'quiz') { renderQuiz(); tabCount('quiz', 3); }
+      }
+      bstat.textContent = jobs.length + '/' + jobs.length + ' 已完成';
+
+      await sleep(350);
+      if (full) {
+        report(b, '一节课的三样产物都齐了', [
+          '模型：' + model,
+          '课件：24 页，导出 PPTX / PDF',
+          '讲课视频：08:40，讲师 ' + TUTORS[s.tutor].n + '，口型已对齐',
+          '随堂练习：3 题，含逐题解析',
+          '三样产物同源，改课件会一并重写讲稿与练习'
+        ], 2);
+      } else {
+        report(b, '课件已生成', ['模型：' + model, '24 页，导出 PPTX / PDF', '讲稿已写好，随时可以补出视频'], 1);
+      }
+
+      setRunning(false);
+      openTab('deck');
+
+      quickReplies(b, [['lms', '导出到 LMS'], ['next', '接着做下一节'], ['tutor', '换个讲师']], function (q) {
+        if (q === 'tutor') { openTab('video', true); toast('在「讲课视频」Tab 里换讲师，换完只重渲染视频，课件不动'); return; }
+        if (q === 'lms') { toast('将打包成 SCORM 1.2 上传到 LMS（外观稿未接入）'); return; }
+        userMsg('接着做下一节');
+        say(agentBlock(), '下一节是《超重与失重》，它依赖本节的 F = ma。要我沿用同一位讲师和课件样式吗？', 'small');
+      });
+    }
+
+    /* ---------- 课件 ---------- */
+    function renderDeck(outlineOnly) {
+      var host = panel('deck');
+      if (!s.built && !outlineOnly) { host.innerHTML = emptyBox('📊', '还没有课件。<br>说一句你要讲什么，产出会出现在这里。'); return; }
+      var sl = SLIDES[s.slide];
+
+      host.innerHTML =
+        '<div class="crumb">' + COURSE + ' <span class="sep">·</span> ' +
+        (outlineOnly ? '大纲已排好，等待生成' : '24 页') + '</div>' +
+        '<div class="deck"><div class="deck-bar">📊 ' + COURSE +
+          '<span class="pg"><button data-nav="-1"' + (s.slide === 0 ? ' disabled' : '') + '>‹</button>' +
+          '第 ' + (s.slide + 1) + ' 页 / 共 24 页' +
+          '<button data-nav="1"' + (s.slide === SLIDES.length - 1 ? ' disabled' : '') + '>›</button></span></div>' +
+          '<div class="slide"><div class="kicker">' + sl.k + '</div><h4>' + sl.t + '</h4>' +
+          '<ul>' + sl.b.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>' +
+          '<div class="figure' + (sl.board ? ' board' : '') + '">' + sl.f + '</div></div>' +
+        '</div>' +
+        '<div class="thumbs">' + SLIDES.map(function (x, i) {
+          return '<button class="' + (i === s.slide ? 'on' : '') + '" data-slide="' + i + '">' + (i + 1) + '</button>';
+        }).join('') + '</div>' +
+        '<p class="dim" style="font-size:11.5px;margin-top:8px">外观稿只画了 6 页代表页，实际 24 页</p>' +
+
+        (s.built ? '<div class="sec-label">导出</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+          '<button class="sbtn primary" data-act="pptx">⤓ 导出 PPTX</button>' +
+          '<button class="sbtn" data-act="pdf">⤓ 导出 PDF</button></div>' : '') +
+
+        '<div class="sec-label">本节知识点</div>' +
+        '<div class="kmap">' + POINTS.map(function (p) {
+          return '<span class="' + (p[1] ? 'core' : '') + '">' + p[0] + '</span>';
+        }).join('') + '</div>' +
+        '<div class="hint">💡 课件、讲稿、练习题是同一份知识点图谱生成的。改课件里的知识点，讲稿和练习会跟着重写——不用你三样各改一遍。</div>';
+
+      $$('[data-slide]', host).forEach(function (bt) {
+        bt.addEventListener('click', function () { s.slide = +bt.getAttribute('data-slide'); renderDeck(outlineOnly); });
+      });
+      $$('[data-nav]', host).forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          s.slide = Math.max(0, Math.min(SLIDES.length - 1, s.slide + (+bt.getAttribute('data-nav'))));
+          renderDeck(outlineOnly);
+        });
+      });
+      bindActs(host, { pptx: '正在导出 PPTX…（外观稿未接入）', pdf: '正在导出 PDF…（外观稿未接入）' });
+    }
+
+    /* ---------- 讲课视频 ---------- */
+    function renderVideo() {
+      var host = panel('video');
+      if (!s.built) { host.innerHTML = emptyBox('🎬', '还没有讲课视频。'); return; }
+      var t = TUTORS[s.tutor];
+      var sl = SLIDES[Math.min(s.slide, SLIDES.length - 1)];
+
+      host.innerHTML =
+        '<div class="crumb">' + COURSE + ' <span class="sep">·</span> 讲课视频 08:40</div>' +
+        '<div class="lesson">' +
+          '<div class="tutor-frame" id="tutorFrame" style="background:linear-gradient(165deg,' + t.c + '44,#0C1418)">' +
+            '<div class="mouth"></div><div class="nm">' + t.n + '</div></div>' +
+          '<div class="lesson-slide"><div class="slide" style="aspect-ratio:auto;height:100%">' +
+            '<div class="kicker">' + sl.k + '</div><h4>' + sl.t + '</h4>' +
+            '<ul>' + sl.b.slice(0, 2).map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div></div>' +
+        '</div>' +
+
+        '<div class="mrow" style="margin-top:10px"><button class="sbtn" style="padding:0 14px" id="eduPlay">▶ 播放</button>' +
+          '<div style="flex:1;margin:0 10px;height:4px;border-radius:2px;background:rgba(255,255,255,.12)">' +
+          '<i id="eduBar" style="display:block;width:0;height:100%;border-radius:2px;background:var(--accent)"></i></div>' +
+          '<span class="mono dim" style="font-size:11.5px"><span id="eduNow">00:00</span> / 08:40</span></div>' +
+
+        '<div class="sec-label">讲师</div>' +
+        '<div class="tutors">' + TUTORS.map(function (x, i) {
+          return '<button class="tutor' + (i === s.tutor ? ' on' : '') + '" data-tutor="' + i + '">' +
+            '<span class="face" style="background:linear-gradient(140deg,' + x.c + ',#14141F)"></span>' + x.n + '</button>';
+        }).join('') +
+        '<button class="tutor clone" data-act="clone"><span class="face">＋</span>克隆我自己</button></div>' +
+        '<p class="dim" style="font-size:11.5px;margin-top:8px">当前音色：' + t.v + '，换讲师只重渲染视频，课件和练习不动</p>' +
+
+        '<div class="sec-label">导出</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+          '<button class="sbtn primary" data-act="mp4">⤓ 导出 MP4</button>' +
+          '<button class="sbtn" data-act="scorm">⤓ 导出 SCORM</button></div>';
+
+      $$('[data-tutor]', host).forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          s.tutor = +bt.getAttribute('data-tutor');
+          renderVideo();
+          toast('已换成 ' + TUTORS[s.tutor].n + ' · ' + TUTORS[s.tutor].v);
+        });
+      });
+      bindActs(host, {
+        clone: '上传 3 分钟视频即可克隆你的形象与声音',
+        mp4: '正在导出 MP4…（外观稿未接入）',
+        scorm: '打包成 SCORM 1.2，可直接上传 LMS（外观稿未接入）'
+      });
+
+      var btn = $('#eduPlay', host);
+      btn.addEventListener('click', function () {
+        var frame = $('#tutorFrame');
+        if (play.on) { frame.classList.remove('talking'); btn.textContent = '▶ 播放'; stopPlay(); return; }
+        frame.classList.add('talking');
+        btn.textContent = '❚❚ 暂停';
+        togglePlay(s.dur, function (tt) {
+          var bar = $('#eduBar'); if (!bar) return false;
+          bar.style.width = (tt / s.dur * 100) + '%';
+          $('#eduNow').textContent = fmt(tt);
+          // 讲到哪一页，右边课件就翻到哪一页
+          var idx = Math.min(SLIDES.length - 1, Math.floor(tt / s.dur * SLIDES.length));
+          if (idx !== s.slide) { s.slide = idx; renderVideo(); $('#tutorFrame').classList.add('talking'); $('#eduPlay').textContent = '❚❚ 暂停'; }
+          return true;
+        }, btn);
+      });
+    }
+
+    /* ---------- 练习题 ---------- */
+    function renderQuiz() {
+      var host = panel('quiz');
+      if (!s.built) { host.innerHTML = emptyBox('📝', '还没有练习题。'); return; }
+      host.innerHTML =
+        '<div class="crumb">' + COURSE + ' <span class="sep">·</span> 随堂练习 3 题</div>' +
+        QUIZ.map(function (q, i) {
+          return '<div class="q" data-q="' + i + '"><div class="qh"><b>Q' + (i + 1) + '</b>' +
+            '<span>' + q.t + ' · ' + q.q + '</span></div>' +
+            q.o.map(function (o, j) {
+              return '<div class="opt' + (j === q.a ? ' right' : '') + '"><span class="k">' +
+                (j === q.a ? '✓' : String.fromCharCode(65 + j)) + '</span>' + o + '</div>';
+            }).join('') +
+            '<button class="toggle-why">看解析 ⌄</button>' +
+            '<div class="why">' + q.w + '</div></div>';
+        }).join('') +
+        '<div class="sec-label">导出</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+          '<button class="sbtn primary" data-act="bank">⤓ 导出题库</button>' +
+          '<button class="sbtn" data-act="online">↗ 发布在线测验</button></div>' +
+        '<div class="hint">💡 题目是按本节知识点图谱出的，覆盖了 3 个核心点。学生答错会回链到对应的课件页。</div>';
+
+      $$('.toggle-why', host).forEach(function (bt) {
+        bt.addEventListener('click', function () {
+          var q = bt.closest('.q');
+          var open = q.classList.toggle('open');
+          bt.textContent = open ? '收起解析 ⌃' : '看解析 ⌄';
+        });
+      });
+      bindActs(host, { bank: '正在导出题库…（外观稿未接入）', online: '将生成一个在线测验链接（外观稿未接入）' });
+    }
+
+    function init() {
+      panel('deck').innerHTML = emptyBox('📊', '还没有课件。<br>说一句你要讲什么，产出会出现在这里。');
+      panel('video').innerHTML = emptyBox('🎬', '还没有讲课视频。');
+      panel('quiz').innerHTML = emptyBox('📝', '还没有练习题。');
+      panel('settings').innerHTML =
+        row('学段', ['高中*', '初中', '小学', '高校', '企业内训']) +
+        row('课时', ['20 分钟', '45 分钟*', '90 分钟']) +
+        row('难度', ['基础', '标准*', '拔高']) +
+        row('板书', ['自动生成*', '手写风格', '不要板书']) +
+        row('导出', ['PPTX + MP4*', '仅课件', '仅视频', 'SCORM 包']) +
+        '<div class="sec-label">LMS 对接</div>' +
+        '<p class="dim" style="font-size:12.5px;line-height:1.8">支持 SCORM 1.2 / xAPI，可直接上传到 Moodle、Canvas 或企业内部 LMS。</p>' +
+        '<div class="sec-label">额度</div><p class="dim" style="font-size:12.5px;line-height:1.8">' +
+        '整节课（课件 + 视频 + 练习）消耗 <b style="color:var(--accent)">2 额度</b><br>只出课件消耗 1 额度</p>';
+      bindSegs(panel('settings'));
+      $('#gridToggle').style.display = 'none';
+    }
+
+    return {
+      init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
+      defaultPrompt: '做一节《牛顿第二定律》，高一物理，45 分钟，要有实验演示和随堂练习',
+      envBadge: '<b>高一物理</b><span class="sep">·</span>力学单元',
+      composerExtra: modelSelect([
+        ['Veo 3.1', '同步对白'],
+        ['Kling 3.0', '多语种口型'],
+        ['Seedance 2.5', '形象最稳'],
+        ['HappyHorse 1.0', '画质榜前二']
+      ])
+    };
+  })();
 
   /* ============================================================
      小工具（模式实现共用）
@@ -1657,7 +1997,7 @@
   /* ============================================================
      装配
      ============================================================ */
-  var IMPL = ({ video: VIDEO, drama: DRAMA, app: APP })[mode] || TODO;
+  var IMPL = { video: VIDEO, drama: DRAMA, education: EDU, app: APP }[mode];
   IMPL.renderEmpty($('#emptyBody'));
   IMPL.renderParams($('#params'));
   IMPL.init();

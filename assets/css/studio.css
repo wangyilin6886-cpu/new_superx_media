@@ -934,3 +934,96 @@ body.nav-open .scrim { opacity: 1; visibility: visible; }
 html:not([lang="zh-CN"]) .tab { padding: 0 10px; font-size: 12.5px; }
 html:not([lang="zh-CN"]) .cbtn { padding: 0 8px; }
 html:not([lang="zh-CN"]) .top-btn { white-space: nowrap; }
+
+/* ============================================================
+   AI 教育模式
+   ============================================================ */
+
+/* 课件翻页器 */
+.deck { border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--ink-900); }
+.deck-bar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 11px;
+  border-bottom: 1px solid var(--line); font-size: 12px; color: var(--text-3);
+  background: rgba(255,255,255,.02);
+}
+.deck-bar .pg { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; }
+.deck-bar button {
+  width: 24px; height: 24px; border-radius: 6px; color: var(--text-3);
+  display: grid; place-items: center; transition: all .16s var(--ease);
+}
+.deck-bar button:hover { background: rgba(255,255,255,.08); color: var(--text-1); }
+.deck-bar button[disabled] { opacity: .3; pointer-events: none; }
+
+.slide { aspect-ratio: 16/9; padding: 18px 20px; display: flex; flex-direction: column; background: linear-gradient(160deg, rgba(52,211,153,.05), transparent); }
+.slide h4 { font-size: 15px; margin-bottom: 4px; }
+.slide .kicker { font-size: 10.5px; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+.slide ul { display: grid; gap: 7px; font-size: 12px; color: var(--text-2); }
+.slide li { display: flex; gap: 8px; line-height: 1.55; }
+.slide li::before { content: "▸"; color: var(--accent); flex: none; }
+.slide .figure {
+  margin-top: auto; height: 62px; border-radius: 9px; display: grid; place-items: center;
+  border: 1px dashed rgba(255,255,255,.14); background: rgba(255,255,255,.02);
+  font-size: 11.5px; color: var(--text-3);
+}
+.slide .board { font-family: "JetBrains Mono", monospace; color: var(--text-2); }
+
+.thumbs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-top: 10px; }
+.thumbs button {
+  aspect-ratio: 16/10; border-radius: 5px; border: 1px solid var(--line);
+  background: rgba(255,255,255,.03); font-size: 9px; color: var(--text-3);
+  transition: all .16s var(--ease);
+}
+.thumbs button:hover { border-color: var(--line-strong); }
+.thumbs button.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+/* 讲课视频：讲师 + 课件分屏 */
+.lesson { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 10px; background: var(--ink-900); }
+.tutor-frame { aspect-ratio: 3/4; border-radius: 10px; position: relative; overflow: hidden; display: grid; place-items: end center; padding-bottom: 10px; }
+.tutor-frame .nm { font-size: 11px; color: rgba(255,255,255,.85); text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+.tutor-frame .mouth {
+  position: absolute; left: 50%; top: 52%; width: 16px; height: 4px; border-radius: 3px;
+  background: rgba(255,255,255,.55); transform: translateX(-50%);
+}
+.tutor-frame.talking .mouth { animation: talk .28s steps(2) infinite; }
+@keyframes talk { 0%,100% { height: 3px; } 50% { height: 8px; } }
+.lesson-slide { border-radius: 10px; border: 1px solid var(--line); overflow: hidden; }
+
+.tutors { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tutor {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; width: 60px;
+  font-size: 10.5px; line-height: 1.35; color: var(--text-3); transition: color .16s;
+}
+.tutor .face { width: 40px; height: 40px; border-radius: 50%; border: 2px solid transparent; transition: all .18s var(--ease); }
+.tutor:hover { color: var(--text-1); }
+.tutor.on { color: var(--accent); }
+.tutor.on .face { border-color: var(--accent); transform: scale(1.06); }
+.tutor.clone .face { display: grid; place-items: center; border: 1px dashed rgba(255,255,255,.2); background: rgba(255,255,255,.03); font-size: 15px; }
+
+/* 练习题 */
+.q { border: 1px solid var(--line); border-radius: var(--r); padding: 12px; margin-bottom: 10px; }
+.q .qh { display: flex; gap: 8px; font-size: 12.5px; margin-bottom: 10px; line-height: 1.6; }
+.q .qh b { color: var(--accent); font-family: "JetBrains Mono", monospace; flex: none; }
+.q .opt {
+  display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px;
+  font-size: 12px; color: var(--text-2); border: 1px solid transparent; margin-bottom: 5px;
+}
+.q .opt .k { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--line-strong); display: grid; place-items: center; font-size: 9px; flex: none; }
+.q .opt.right { border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.08); color: var(--text-1); }
+.q .opt.right .k { background: var(--ok); border-color: var(--ok); color: #0B0B10; font-weight: 700; }
+.q .why { margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--text-3); line-height: 1.7; display: none; }
+.q.open .why { display: block; }
+.q .toggle-why { font-size: 11.5px; color: var(--accent); margin-top: 8px; }
+
+/* 知识点图谱 */
+.kmap { display: flex; flex-wrap: wrap; gap: 6px; }
+.kmap span {
+  height: 26px; padding: 0 11px; border-radius: 999px; font-size: 11.5px;
+  display: inline-flex; align-items: center;
+  border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--text-2);
+}
+.kmap span.core { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+@media (max-width: 768px) {
+  .lesson { grid-template-columns: 1fr; }
+  .thumbs { grid-template-columns: repeat(4, 1fr); }
+}
