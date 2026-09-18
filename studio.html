@@ -90,46 +90,8 @@
     <div class="thread" id="thread">
       <!-- 空状态 -->
       <div class="empty" id="empty">
-        <div class="dot-title"><i></i>你想做什么样的短视频？</div>
-
-        <div class="empty-label" style="margin-top:0">从这些开始 ——</div>
-        <div class="starter-grid">
-          <button class="starter" data-starter="link">
-            <div class="ico">🔗</div>
-            <b>商品链接出片</b>
-            <span>粘贴淘宝 / 京东 / 抖音小店链接</span>
-          </button>
-          <button class="starter" data-starter="copy">
-            <div class="ico">📝</div>
-            <b>一段文案出片</b>
-            <span>已经写好卖点了，直接排片</span>
-          </button>
-          <button class="starter" data-starter="ref">
-            <div class="ico">🎯</div>
-            <b>竞品同款</b>
-            <span>发一条参考视频，做同结构的</span>
-          </button>
-        </div>
-
-        <div class="empty-label">或者看看别人怎么做的（点开能看到完整对话，含原始 prompt）：</div>
-        <div class="sample-row">
-          <button class="sample" data-sample="美妆">
-            <div class="cov" style="background:linear-gradient(160deg,#4A1A24,#170C12)"></div>
-            <div class="nm">美妆 · 成本 -72%</div>
-          </button>
-          <button class="sample" data-sample="3C">
-            <div class="cov" style="background:linear-gradient(160deg,#16283F,#0B1220)"></div>
-            <div class="nm">3C · 测评式</div>
-          </button>
-          <button class="sample" data-sample="食品">
-            <div class="cov" style="background:linear-gradient(160deg,#3F2A12,#1A1208)"></div>
-            <div class="nm">食品 · 口播</div>
-          </button>
-          <button class="sample" data-sample="服饰">
-            <div class="cov" style="background:linear-gradient(160deg,#2C1840,#140B1E)"></div>
-            <div class="nm">服饰 · 穿搭</div>
-          </button>
-        </div>
+        <div class="dot-title"><i></i></div>
+        <div id="emptyBody"></div>
       </div>
 
       <!-- 对话流由 JS 注入 -->
@@ -137,13 +99,7 @@
     </div>
 
     <div class="composer-wrap">
-      <div class="params" id="params">
-        <div class="prow"><span>平台</span><div class="seg" data-single><button class="on">抖音</button><button>视频号</button><button>小红书</button><button>TikTok</button></div></div>
-        <div class="prow"><span>时长</span><div class="seg" data-single><button>15s</button><button class="on">15–30s</button><button>60s</button></div></div>
-        <div class="prow"><span>口播风格</span><div class="seg" data-single><button class="on">痛点式</button><button>测评式</button><button>故事式</button><button>对比式</button><button>清单式</button></div></div>
-        <div class="prow"><span>音色</span><div class="seg" data-single><button class="on">温柔女声</button><button>活力女声</button><button>沉稳男声</button><button>克隆我的声音</button></div></div>
-        <div class="prow"><span>批量</span><div class="seg" data-single><button>3 条</button><button class="on">5 条</button><button>10 条</button><button>30 条</button></div></div>
-      </div>
+      <div class="params" id="params"></div>
 
       <div class="composer">
         <textarea id="input" rows="1" placeholder="告诉 SuperX 你要什么…"></textarea>
@@ -167,28 +123,14 @@
   <!-- ============ 右栏工作台 ============ -->
   <aside class="side" id="side">
     <div class="side-top">
-      <button class="tab on" data-tab="clips">成片<span class="n" id="clipCount"></span></button>
-      <button class="tab" data-tab="scripts">脚本<span class="n" id="scriptCount"></span></button>
-      <button class="tab" data-tab="assets">素材</button>
-      <button class="tab" data-tab="settings">设置</button>
+      <div id="tabs" style="display:flex;gap:2px;min-width:0;overflow-x:auto"></div>
       <span class="sp"></span>
       <button class="icon-btn" id="gridToggle" title="网格 / 单条">⊞</button>
       <button class="icon-btn" id="sideClose" title="收起工作台">⊟</button>
     </div>
 
-    <div class="side-body">
-      <div class="panel on" data-panel="clips" id="panelClips">
-        <div class="side-empty">
-          <div>
-            <div class="ic">🎬</div>
-            <p>还没有成片。<br>在左边说一句你要什么，产出会出现在这里。</p>
-          </div>
-        </div>
-      </div>
-      <div class="panel" data-panel="scripts" id="panelScripts"></div>
-      <div class="panel" data-panel="assets" id="panelAssets"></div>
-      <div class="panel" data-panel="settings" id="panelSettings"></div>
-    </div>
+    <div class="side-body" id="sideBody"></div>
+
   </aside>
 
 </div>

@@ -622,3 +622,122 @@ body.nav-open .scrim { opacity: 1; visibility: visible; }
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   .thread { scroll-behavior: auto; }
 }
+
+/* ============================================================
+   短剧模式 · 右栏工作台
+   对应设计稿 docs/design/05-studio.md §7
+   ============================================================ */
+
+/* 面包屑 */
+.crumb {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  font-size: 12.5px; color: var(--text-3); margin-bottom: 12px;
+}
+.crumb b { color: var(--text-1); font-weight: 600; }
+.crumb .sep { opacity: .5; }
+
+/* 16:9 舞台 */
+.stage16 {
+  aspect-ratio: 16/9; border-radius: var(--r-lg); position: relative; overflow: hidden;
+  border: 1px solid var(--line);
+}
+.stage16 .play {
+  position: absolute; inset: 0; margin: auto; width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(0,0,0,.4); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.3); display: grid; place-items: center; color: #fff;
+  transition: transform .2s var(--ease), background .2s;
+}
+.stage16 .play:hover { transform: scale(1.08); background: rgba(0,0,0,.6); }
+.stage16 .ep { position: absolute; left: 12px; top: 11px; font-size: 11px; font-weight: 600; color: var(--accent); }
+.stage16 .nm { position: absolute; left: 12px; top: 28px; font-size: 14px; font-weight: 600; }
+.stage16 .line {
+  position: absolute; left: 12px; right: 12px; bottom: 30px; text-align: center;
+  font-size: 12px; color: #fff; text-shadow: 0 1px 5px rgba(0,0,0,.9); line-height: 1.5;
+}
+.stage16 .scrub { position: absolute; left: 12px; right: 12px; bottom: 11px; }
+.stage16 .scrub .bar { height: 3px; border-radius: 2px; background: rgba(255,255,255,.25); overflow: hidden; }
+.stage16 .scrub .bar i { display: block; height: 100%; background: #fff; border-radius: 2px; }
+.stage16 .scrub .t { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,.8); margin-top: 4px; }
+
+/* 剧集进度条 */
+.eps { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.ep-cell {
+  aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--line);
+  display: grid; place-items: center; font-size: 10px; font-weight: 600;
+  color: var(--text-3); background: rgba(255,255,255,.02);
+  transition: all .16s var(--ease); position: relative; overflow: hidden;
+}
+.ep-cell:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+.ep-cell.ok { border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.1); color: var(--ok); }
+.ep-cell.run { border-color: var(--accent); color: var(--accent); }
+.ep-cell.run .fill { position: absolute; inset: auto 0 0 0; background: var(--accent-soft); }
+.ep-cell.on { border-color: var(--accent); background: var(--accent); color: #0B0B10; }
+.ep-cell span { position: relative; z-index: 1; }
+.ep-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 9px; font-size: 11px; color: var(--text-3); }
+.ep-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: 0; }
+
+/* 剧本块 */
+.screenplay {
+  border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden;
+  background: rgba(255,255,255,.02);
+}
+.screenplay .sp-head {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  font-size: 12.5px; font-weight: 600; border-bottom: 1px solid var(--line);
+}
+.screenplay .sp-head .act { margin-left: auto; font-size: 12px; color: var(--accent); font-weight: 500; }
+.screenplay .sp-body { padding: 12px; font-size: 12.5px; line-height: 1.9; max-height: 260px; overflow-y: auto; }
+.screenplay .sp-body.all { max-height: none; }
+.sl-scene { color: var(--text-3); }
+.sl-move { color: var(--p2); }
+.sl-name { color: var(--text-1); font-weight: 600; }
+.sl-note { color: var(--text-3); font-size: 11.5px; }
+.sl-line { color: var(--text-1); }
+.sl-line.on { background: var(--accent-soft); border-radius: 5px; padding: 0 4px; }
+
+/* 角色 */
+.cast { display: flex; gap: 8px; flex-wrap: wrap; }
+.cast-chip {
+  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px 0 4px;
+  border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.03);
+  font-size: 12.5px; transition: all .18s var(--ease);
+}
+.cast-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+.cast-chip .face { width: 26px; height: 26px; border-radius: 50%; flex: none; }
+
+.char-card { border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px; margin-bottom: 10px; transition: border-color .2s; }
+.char-card:hover { border-color: var(--line-strong); }
+.char-top { display: flex; gap: 12px; }
+.char-top .face { width: 52px; height: 52px; border-radius: 12px; flex: none; }
+.char-top h4 { font-size: 14px; }
+.char-top .role { font-size: 11px; color: var(--accent); margin-left: 6px; font-weight: 500; }
+.char-top .bio { font-size: 12px; color: var(--text-3); margin-top: 4px; line-height: 1.6; }
+.char-meta { display: flex; align-items: center; gap: 10px; margin-top: 11px; font-size: 12px; flex-wrap: wrap; }
+.lock {
+  display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px;
+  border-radius: 7px; border: 1px solid var(--line); font-size: 12px; color: var(--text-3);
+  transition: all .18s var(--ease);
+}
+.lock.on { border-color: var(--ok); color: var(--ok); background: rgba(52,211,153,.1); }
+.refs { display: flex; gap: 6px; margin-top: 11px; align-items: center; }
+.ref {
+  width: 44px; aspect-ratio: 3/4; border-radius: 7px; border: 1px solid var(--line);
+  display: grid; place-items: end center; padding-bottom: 3px; font-size: 9px; color: rgba(255,255,255,.7);
+}
+.ref.add { border-style: dashed; color: var(--text-3); place-items: center; font-size: 14px; }
+.ref.add:hover { border-color: var(--accent); color: var(--accent); }
+
+.hint {
+  margin-top: 14px; padding: 11px 13px; border-radius: var(--r);
+  background: var(--accent-soft); font-size: 12.5px; color: var(--text-2); line-height: 1.7;
+}
+
+/* 短剧的批次格子是横版 */
+.tile.wide { width: 74px; aspect-ratio: 16/9; }
+
+@media (max-width: 1024px) {
+  .stage16 { width: 100%; }
+}
+@media (max-width: 768px) {
+  .eps { grid-template-columns: repeat(5, 1fr); }
+}
