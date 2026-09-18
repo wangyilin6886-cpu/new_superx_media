@@ -132,8 +132,14 @@ dig www.superx-id.com +short
 
 ```
 assets/*   public, max-age=600, stale-while-revalidate=86400
-*.html     public, max-age=0, must-revalidate
 ```
+
+HTML 没有单独写规则——Vercel 对静态 HTML 的默认值就是
+`public, max-age=0, must-revalidate`，正是我们要的。
+
+> `vercel.json` 是严格 JSON，**不能写注释**，header 对象里也只允许 `key` / `value`
+> 两个字段。多加任何属性（哪怕是想当注释用的 `comment`）都会在 import 时报
+> `should NOT have additional property`。说明性的文字写在这份文档里，不要写进配置。
 
 改了样式或脚本，用户最多 10 分钟内就能拿到新版。如果以后接了构建流程、文件名带上哈希，
 再把 `assets/` 那条换成 `max-age=31536000, immutable`。
