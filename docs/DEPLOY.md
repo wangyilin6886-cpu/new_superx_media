@@ -1,0 +1,151 @@
+# 部署到 superx-id.com（Vercel + Cloudflare DNS）
+
+站点是**纯静态**的：没有 `package.json`，没有构建步骤，Vercel 直接把仓库根目录当静态站发出去。
+
+---
+
+## 一、先把旧站从 Vercel 摘掉
+
+**顺序很重要。** 一个域名在同一时间只能绑在一个 Vercel 项目上，旧项目不放手，新项目就加不上
+`superx-id.com`，而且会提示 "Domain is already in use by another project"。
+
+1. 打开 https://vercel.com/dashboard，进旧项目
+2. **Settings → Domains**，把 `superx-id.com` 和 `www.superx-id.com` 逐个 **Remove**
+3. 确认域名列表里已经没有这两条
+4. 再 **Settings → 最下方 Delete Project**（要输项目名确认）
+
+> 只想先停掉、不想删项目的话：做完第 2 步就够了，域名已经释放。
+> 项目留着不影响新部署，只是会一直挂在 dashboard 里。
+
+删项目不可撤销，旧站的部署历史和环境变量会一起没。如果旧站上有还要用的环境变量，
+先在 Settings → Environment Variables 里抄下来。
+
+---
+
+## 二、部署这个仓库
+
+1. Vercel dashboard → **Add New → Project**
+2. 选 GitHub 仓库 `wangyilin6886-cpu/new_superx_media`
+3. 配置页面这样填：
+
+   | 项 | 值 |
+   |---|---|
+   | Framework Preset | **Other** |
+   | Root Directory | `./`（默认） |
+   | Build Command | **留空**（覆盖掉默认值） |
+   | Output Directory | **留空**（默认就是仓库根目录） |
+   | Install Command | **留空** |
+
+4. **Deploy**，大约十几秒完成，会给一个 `xxx.vercel.app` 的临时地址，先打开确认没问题
+
+### 关于分支
+
+仓库当前的默认分支是 `claude/kind-knuth-i9y662`，Vercel 会把它当作 Production 分支。
+能用，但生产站挂在这么个分支名上不太体面。建议二选一：
+
+- **在 GitHub 上把这个分支重命名为 `main`**（Settings → Branches），Vercel 会自动跟上；或
+- 保留现状，在 Vercel 的 Settings → Git → Production Branch 里显式指定
+
+---
+
+## 三、Cloudflare DNS
+
+域名在 Cloudflare，所以解析在 Cloudflare 改，**不要**动 nameserver。
+
+进 Cloudflare → 选 `superx-id.com` → **DNS → Records**，先删掉指向旧站的旧记录，然后加：
+
+| 类型 | 名称 | 内容 | 代理状态 |
+|---|---|---|---|
+| A | `@` | `76.76.21.21` | **DNS only（灰云）** |
+| CNAME | `www` | `cname.vercel-dns.com` | **DNS only（灰云）** |
+
+> Vercel 在添加域名时会显示它当前要求的具体记录值，**以 Vercel 页面上显示的为准**——
+> 上面这两个值是 Vercel 目前的标准值，但它偶尔会调整。
+
+### 代理状态必须是灰云
+
+这是这套组合最容易踩的坑。橙云（Proxied）意味着 Cloudflare 代理流量，会导致：
+
+- Vercel 签不出证书（它需要直接验证域名归属）
+- 或者签出来了，但 Cloudflare 边缘和 Vercel 之间证书不匹配，浏览器报错
+- 最典型的表现是 **ERR_TOO_MANY_REDIRECTS**（重定向循环）
+
+**灰云就好了**——DNS 解析照常走 Cloudflare，HTTPS 由 Vercel 自己签发和续期，Vercel 本身
+就在全球 CDN 上，不缺 Cloudflare 这一层加速。
+
+如果你确实要开橙云（比如想用 Cloudflare 的 WAF），那么 Cloudflare 的
+**SSL/TLS → Overview** 必须设成 **Full (strict)**，绝不能是 Flexible——Flexible 就是
+上面那个重定向循环的根源。
+
+---
+
+## 四、在 Vercel 绑定域名
+
+1. 新项目 → **Settings → Domains**
+2. 加 `superx-id.com`，再加 `www.superx-id.com`
+3. Vercel 会自动把其中一个设为主域、另一个 301 跳过去（默认 apex 为主）
+4. 等状态从 "Invalid Configuration" 变成 **Valid**，证书自动签发
+
+DNS 生效通常几分钟内，偶尔要等到 TTL 过期。查进度：
+
+```bash
+dig superx-id.com +short
+dig www.superx-id.com +short
+```
+
+---
+
+## 五、上线前必须知道的事
+
+**这是一个外观原型，不是能用的产品。** 挂在正式域名上之前，确认你接受这些：
+
+- **登录是假的。** `assets/js/auth.js` 只往 `localStorage` 写一个标记，任何邮箱 + 8 位以上
+  密码都能进。没有后端、没有校验、没有真实账号。
+- **所有数据是假的。** 成片、剧集、课件、应用全部是写死的演示内容，点「生成」不会真的生成。
+- **表单不发请求。** 预约演示、忘记密码、导出、部署全是占位。
+- 客户 Logo、案例数据、定价都是占位内容，**不要当作对外承诺**。
+
+如果不想让公众误以为这是上线产品，两个办法：
+
+1. **加一条演示横幅**（我可以做，十分钟的事），页面顶部常驻一行
+   "这是产品演示，功能尚未开放"
+2. **用 Vercel 的访问保护**：Settings → Deployment Protection → Password Protection，
+   设一个密码，只有拿到密码的人能看。适合只给客户和投资人看的阶段。
+
+---
+
+## 六、仓库里已经为部署准备好的东西
+
+| 文件 | 作用 |
+|---|---|
+| `vercel.json` | 干净 URL（`/studio` 而非 `/studio.html`）、缓存策略、安全响应头 |
+| `404.html` | 404 页，Vercel 静态站自动识别 |
+| `robots.txt` | 允许抓取，指向 sitemap |
+| `sitemap.xml` | 三个页面 |
+| `assets/img/og.png` | 1200×630 分享图，微信 / WhatsApp / X / LinkedIn 通用 |
+| 各页 `<head>` | canonical、Open Graph、twitter:card、theme-color |
+
+### 关于缓存策略
+
+`assets/` 下的文件名**没有内容哈希**（`styles.css` 而不是 `styles.a3f9.css`），所以
+`vercel.json` 里故意没用 `immutable`，而是：
+
+```
+assets/*   public, max-age=600, stale-while-revalidate=86400
+*.html     public, max-age=0, must-revalidate
+```
+
+改了样式或脚本，用户最多 10 分钟内就能拿到新版。如果以后接了构建流程、文件名带上哈希，
+再把 `assets/` 那条换成 `max-age=31536000, immutable`。
+
+---
+
+## 七、后续每次更新
+
+推到 Production 分支，Vercel 自动构建部署，一般 15 秒内完成：
+
+```bash
+git push origin <production-branch>
+```
+
+其他分支推上去会生成 Preview 部署，有独立链接，不影响正式站。

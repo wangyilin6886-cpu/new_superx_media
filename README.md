@@ -3,6 +3,15 @@
 按 `docs/design/` 的设计稿实现的公司官网首页（12 屏）。
 **纯静态外观稿**：没有后端、没有构建步骤，双击 `index.html` 就能看。
 
+## 部署
+
+线上环境是 **Vercel + Cloudflare DNS**，域名 `superx-id.com`。
+完整步骤见 **[`docs/DEPLOY.md`](docs/DEPLOY.md)**，包括怎么把旧站从 Vercel 摘掉、
+Cloudflare 的解析记录，以及为什么代理状态必须是灰云。
+
+⚠️ **这是外观原型，不是能用的产品**：登录是假的（任何邮箱 + 8 位密码都能进），
+所有数据写死，表单不发请求。挂正式域名前请读 DEPLOY.md 第五节。
+
 ## 本地预览
 
 ```bash
@@ -19,9 +28,14 @@ npx http-server . -p 8080
 
 ```
 index.html              官网首页，12 屏
+404.html                404 页
+vercel.json             Vercel 部署配置（干净 URL / 缓存 / 安全头）
+robots.txt · sitemap.xml
+docs/DEPLOY.md          部署到 superx-id.com 的完整步骤
 studio.html             创作工作台（四个模式全部实现）
 login.html              登录 / 注册 / 找回密码
 assets/img/logo.png     SUPERX INDO 字标（透明底，3x）
+assets/img/og.png       1200×630 社交分享图
 assets/css/styles.css   官网设计系统 + 各屏样式 + 响应式
 assets/css/studio.css   工作台设计系统（密度更高）+ 三栏布局
 assets/css/login.css    登录页布局
@@ -47,7 +61,7 @@ docs/design/            设计稿（plaintext 线框），实现以此为准
 
 **新增界面文案时不用改调用点**，把中文原文补进 `i18n-dict.js` 就生效。
 
-字典共 **932 条 × 2 语言**，是用 Playwright 把三个页面（工作台跑完整演示、展开每个
+字典共 **939 条 × 2 语言**，是用 Playwright 把三个页面（工作台跑完整演示、展开每个
 步骤、切过每个 Tab、走完登录三个视图）的全部可见文本抓出来生成的，再反向跑一遍
 确认零漏译——英文和印尼语各只剩一条「中文」，那是语言选择器自己的选项名。
 
