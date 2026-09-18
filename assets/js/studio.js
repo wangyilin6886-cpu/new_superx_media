@@ -203,6 +203,18 @@
     $('#paramBtn').classList.toggle('on', open);
   });
 
+  /* ---------- 当前模型（输入框旁的选择器） ---------- */
+  function currentModel() {
+    var el = $('#modelSel');
+    return el ? el.value : '';
+  }
+  function modelSelect(opts) {
+    return '<select class="mini-sel" id="modelSel" title="生成模型">' +
+      opts.map(function (o, i) {
+        return '<option value="' + o[0] + '"' + (i === 0 ? ' selected' : '') + '>' + o[0] + ' · ' + o[1] + '</option>';
+      }).join('') + '</select>';
+  }
+
   /* ---------- 对话流基础件 ---------- */
   var thread = $('#thread'), inner = $('#threadInner');
   function scrollDown() { thread.scrollTop = thread.scrollHeight; }
@@ -465,12 +477,13 @@
       card.querySelector('[data-open]').addEventListener('click', function (e) { e.preventDefault(); openTab('clips', true); });
 
       var tiles = $$('.tile', card), bstat = $('.bstat', card), okCount = 0;
+      var model = currentModel();
 
       for (var i = 0; i < clips.length; i++) {
         if (state.abort) { bstat.textContent = '已停止，已完成的保留'; setRunning(false); return; }
         var tile = tiles[i], c = clips[i];
         tile.classList.add('run');
-        bstat.textContent = '正在生成第 ' + (i + 1) + ' 条 · 合成镜头与配音';
+        bstat.textContent = '正在生成第 ' + (i + 1) + ' 条 · ' + model + ' 合成中';
         for (var p = 0; p <= 100; p += 20) {
           if (state.abort) break;
           tile.querySelector('.fill').style.height = p + '%';
@@ -506,6 +519,7 @@
       await sleep(380);
       var ok = clips.filter(function (c) { return c.status === 'ok'; });
       report(b, ok.length + ' 条成片已生成', [
+        '模型：' + model,
         '时长：' + Math.min.apply(null, ok.map(function (c) { return c.dur; })) + '–' + Math.max.apply(null, ok.map(function (c) { return c.dur; })) + ' 秒',
         '格式：9:16 · 1080×1920',
         '音色：温柔女声（可在工作台更换）',
@@ -664,7 +678,13 @@
     }
 
     return { init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
-             defaultPrompt: '用这个链接做 5 条投放素材，主打保湿，要痛点式开场' };
+             defaultPrompt: '用这个链接做 5 条投放素材，主打保湿，要痛点式开场',
+             composerExtra: modelSelect([
+               ['Seedance 2.5', '批量最快'],
+               ['Kling 3.0', '4K 60fps'],
+               ['Veo 3.1', '自带人声'],
+               ['Runway Gen-4.5', '可控性最强']
+             ]) };
   })();
 
   /* ============================================================
@@ -857,6 +877,7 @@
       card.querySelector('[data-open]').addEventListener('click', function (e) { e.preventDefault(); openTab('eps', true); });
 
       var tiles = $$('.tile', card), bstat = $('.bstat', card);
+      var model = currentModel();
       var phases = ['分镜编排', '角色渲染', '配音合成', '配乐与调色'];
 
       for (var i = 0; i < n; i++) {
@@ -866,7 +887,7 @@
         s.eps.push({ n: i + 1, status: 'run' });
         for (var p = 0; p <= 100; p += 25) {
           if (state.abort) break;
-          bstat.textContent = 'EP0' + (i + 1) + ' · ' + phases[Math.min(Math.floor(p / 25), 3)];
+          bstat.textContent = 'EP0' + (i + 1) + ' · ' + phases[Math.min(Math.floor(p / 25), 3)] + '（' + model + '）';
           tile.querySelector('.fill').style.height = p + '%';
           tile.querySelector('span').textContent = p + '%';
           renderEps();
@@ -901,6 +922,7 @@
 
       await sleep(380);
       report(b, n + ' 集已生成', [
+        '模型：' + model,
         '时长：2:10 / 2:25 / 2:30',
         '版式：竖屏 9:16（横屏版可在设置里一并导出）',
         '角色一致性：Maya、Arga 跨 3 集检查通过',
@@ -1110,7 +1132,13 @@
     }
 
     return { init: init, run: run, renderEmpty: renderEmpty, renderParams: renderParams,
-             defaultPrompt: '做一部都市情感短剧，落魄总裁重生复仇 + 双向救赎，20 集，竖屏' };
+             defaultPrompt: '做一部都市情感短剧，落魄总裁重生复仇 + 双向救赎，20 集，竖屏',
+             composerExtra: modelSelect([
+               ['Kling 3.0', '多语种口型'],
+               ['Seedance 2.5', '角色一致性'],
+               ['Veo 3.1', '同步对白'],
+               ['HappyHorse 1.0', '画质榜前二']
+             ]) };
   })();
 
   /* ============================================================
@@ -1271,7 +1299,9 @@
         '<div class="tool"><b>🔧 plan_routes</b></div>' +
         '<div class="res">→ /（首页） · /new（写周报） · /reports（团队周报） · /me（我的）</div>' +
         '<div class="tool"><b>🔧 pick_stack</b></div>' +
-        '<div class="res">→ Next.js 15 App Router + Tailwind + Postgres</div>');
+        '<div class="res">→ Next.js 15 App Router + Tailwind + Postgres</div>' +
+        '<div class="tool"><b>🔧 model</b> ' + currentModel() + '</div>' +
+        '<div class="res">→ 长任务用 agentic 能力最强的那档，改单个组件时会自动降档省额度</div>');
       await sleep(1400); if (state.abort) return stopped();
       s2.done(9);
 
@@ -1327,6 +1357,7 @@
       card.querySelector('[data-open]').addEventListener('click', function (e) { e.preventDefault(); openTab('preview', true); });
 
       var listHost = $('#fileWrite', card), bstat = $('.bstat', card);
+      var model = currentModel();
       s.stage = 0; renderPreview();
 
       for (var i = 0; i < writeable.length; i++) {
@@ -1358,6 +1389,7 @@
       s.stage = 3; renderPreview(); renderDeploy();
 
       report(b, '应用已经跑起来了', [
+        '模型：' + model,
         '4 个页面 · 8 个文件 · 3 张表',
         '已实现：@提及、富文本编辑、导出 PDF、周五邮件提醒',
         '预览地址：weekly-report.superx.app（临时，部署后换正式域名）',
@@ -1555,7 +1587,11 @@
       defaultPrompt: '做一个团队周报工具，能 @人、能导出 PDF，每周五自动提醒',
       envBadge: '<b>Next.js 15</b><span class="sep">·</span>weekly-report',
       composerExtra:
-        '<select class="mini-sel" title="生成模型"><option>SuperX Code v3</option><option>v3 Fast</option></select>' +
+        modelSelect([
+          ['Claude Fable 5.1', 'agentic 最强'],
+          ['Claude Opus 5', '稳'],
+          ['GPT-6 Astra', '备选']
+        ]) +
         '<select class="mini-sel" title="思考强度"><option>标准</option><option>深度</option></select>'
     };
   })();

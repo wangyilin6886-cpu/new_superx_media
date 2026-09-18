@@ -32,6 +32,25 @@ assets/js/auth.js       登录态（localStorage，三个页面共用）
 docs/design/            设计稿（plaintext 线框），实现以此为准
 ```
 
+## 模型选择
+
+三个已实现的模式都在输入框右侧带模型选择器，选中的模型会带进生成过程与完成汇报
+（不是摆设）。模型清单按 2026 年 9 月的实际情况配置：
+
+| 模式 | 可选模型 |
+|------|----------|
+| AI 短视频 | Seedance 2.5（批量最快，默认）· Kling 3.0 · Veo 3.1 · Runway Gen-4.5 |
+| AI 短剧 | Kling 3.0（多语种口型，默认）· Seedance 2.5 · Veo 3.1 · HappyHorse 1.0 |
+| AI App | Claude Fable 5.1（agentic 最强，默认）· Claude Opus 5 · GPT-6 Astra |
+
+短剧默认选 Kling 3.0 是因为它的多语种口型同步最适合分集对白；短视频默认 Seedance 2.5
+是因为它单次可出 30 秒、接受最多 50 张参考图，批量场景更省事。
+
+**没有收录 Sora** —— OpenAI 已于 2026-04-26 下线 Sora 应用与网页端，API 也在
+2026-09-24 关停。
+
+改清单：`assets/js/studio.js` 里各模式的 `composerExtra: modelSelect([...])`。
+
 ## 登录
 
 `login.html` 三个视图：登录 / 注册 / 找回密码，含字段校验、密码显隐、

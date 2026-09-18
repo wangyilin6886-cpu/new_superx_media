@@ -68,6 +68,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 4px; }
 
+/* [hidden] 会被带 display 的类选择器覆盖，这里兜底 */
+[hidden] { display: none !important; }
+
 .mono { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace; }
 .dim { color: var(--text-3); }
 .muted { color: var(--text-2); }
@@ -586,7 +589,10 @@ body.side-collapsed .side-handle { display: grid; }
 }
 
 @media (max-width: 768px) {
-  .app { grid-template-columns: 1fr; }
+  /* 这三条要一起写：1024 断点里的 body.side-collapsed .app 特指度更高，
+     只覆盖 .app 的话手机上主区会一直停在 240px */
+  .app,
+  body.side-collapsed .app,
   body.nav-collapsed .app { grid-template-columns: 1fr; }
   .nav {
     position: fixed; left: 0; top: 0; bottom: 0; width: 280px; z-index: 60;
@@ -607,7 +613,12 @@ body.side-collapsed .side-handle { display: grid; }
   .lb { display: none; }
   .cbtn { padding: 0 9px; }
   .top-btn { padding: 0 10px; }
-  .mode-select { max-width: 104px; }
+  .mode-select { max-width: 92px; }
+  .composer-bar .mini-sel { max-width: 116px; font-size: 11.5px; padding: 0 4px; }
+  /* 模型/强度选择器放不下时换行，发送按钮始终贴右 */
+  .composer-bar { flex-wrap: wrap; row-gap: 6px; }
+  .composer-bar .sp { display: none; }
+  .send { margin-left: auto; }
   .done-bar { flex-wrap: wrap; }
 }
 
@@ -800,6 +811,7 @@ body.nav-open .scrim { opacity: 1; visibility: visible; }
 .composer-bar .mini-sel {
   height: 30px; padding: 0 8px; border-radius: 8px; font-size: 12px;
   color: var(--text-3); background: none; border: 0; cursor: pointer;
+  max-width: 170px; text-overflow: ellipsis;
 }
 .composer-bar .mini-sel:hover { color: var(--text-1); background: rgba(255,255,255,.06); }
 
