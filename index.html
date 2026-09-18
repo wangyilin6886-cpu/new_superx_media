@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SuperX · 一句话，生成一整条内容生产线</title>
+<meta name="description" content="SuperX 用同一套 AI 引擎，帮你做短视频、拍短剧、上好一堂课，也帮你把想法直接变成一个 App。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='5' transform='rotate(45 16 16)' fill='%236C4CF5'/></svg>">
+</head>
+<body>
+
+<!-- ============ 全局导航 ============ -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#top" class="logo"><span class="mark"></span>SuperX</a>
+
+    <ul class="nav-links">
+      <li>
+        <button class="has-menu" aria-haspopup="true">产品 <span aria-hidden="true">▾</span></button>
+        <div class="dropdown">
+          <a class="dd-item" href="#video">
+            <span class="dd-title"><i class="dot" style="background:var(--p1)"></i>AI 短视频</span>
+            <span class="dd-desc">批量出片，一条链接变 30 条成片</span>
+          </a>
+          <a class="dd-item" href="#drama">
+            <span class="dd-title"><i class="dot" style="background:var(--p2)"></i>AI 短剧</span>
+            <span class="dd-desc">剧本到成片，角色跨集不跑脸</span>
+          </a>
+          <a class="dd-item" href="#education">
+            <span class="dd-title"><i class="dot" style="background:var(--p3)"></i>AI 教育</span>
+            <span class="dd-desc">课件 + 讲课视频 + 练习题</span>
+          </a>
+          <a class="dd-item" href="#app">
+            <span class="dd-title"><i class="dot" style="background:var(--p4)"></i>AI App</span>
+            <span class="dd-desc">Vibe Coding，说话就能造应用</span>
+          </a>
+          <div class="dd-foot">
+            <span>SuperX Engine · 四条产品线共用的统一底座</span>
+            <a class="btn-text" href="#engine">了解引擎 <span class="arrow">→</span></a>
+          </div>
+        </div>
+      </li>
+      <li><a href="#engine">解决方案</a></li>
+      <li><a href="#cases">案例</a></li>
+      <li><a href="#pricing">定价</a></li>
+      <li><a href="#about">关于</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a href="#" class="muted">登录</a>
+      <a href="#cta" class="btn btn-primary btn-sm">预约演示</a>
+    </div>
+
+    <button class="burger" id="burger" aria-label="打开菜单" aria-expanded="false"><span></span></button>
+  </div>
+</header>
+
+<nav class="drawer" id="drawer">
+  <a class="drawer-card" href="#video"><i class="dot" style="background:var(--p1)"></i><span><b>AI 短视频</b><br><small class="dim">批量出片</small></span></a>
+  <a class="drawer-card" href="#drama"><i class="dot" style="background:var(--p2)"></i><span><b>AI 短剧</b><br><small class="dim">剧本到成片</small></span></a>
+  <a class="drawer-card" href="#education"><i class="dot" style="background:var(--p3)"></i><span><b>AI 教育</b><br><small class="dim">课件 + 讲课视频</small></span></a>
+  <a class="drawer-card" href="#app"><i class="dot" style="background:var(--p4)"></i><span><b>AI App</b><br><small class="dim">Vibe Coding</small></span></a>
+  <div class="drawer-links">
+    <a href="#engine">解决方案</a>
+    <a href="#cases">案例</a>
+    <a href="#pricing">定价</a>
+    <a href="#about">关于</a>
+    <a href="#">登录</a>
+  </div>
+  <a href="#cta" class="btn btn-primary" style="width:100%;margin-top:18px">预约演示</a>
+</nav>
+
+<!-- ============ 右侧章节轴 ============ -->
+<nav class="rail" id="rail" aria-label="章节导航">
+  <a href="#top" data-target="top"><span class="pip"></span><span class="label">首屏</span></a>
+  <a href="#about" data-target="about"><span class="pip"></span><span class="label">关于</span></a>
+  <a href="#products" data-target="products"><span class="pip"></span><span class="label">产品</span></a>
+  <a href="#video" data-target="video"><span class="pip"></span><span class="label">短视频</span></a>
+  <a href="#drama" data-target="drama"><span class="pip"></span><span class="label">短剧</span></a>
+  <a href="#education" data-target="education"><span class="pip"></span><span class="label">教育</span></a>
+  <a href="#app" data-target="app"><span class="pip"></span><span class="label">AI App</span></a>
+  <a href="#engine" data-target="engine"><span class="pip"></span><span class="label">引擎</span></a>
+  <a href="#how" data-target="how"><span class="pip"></span><span class="label">流程</span></a>
+  <a href="#cases" data-target="cases"><span class="pip"></span><span class="label">案例</span></a>
+  <a href="#pricing" data-target="pricing"><span class="pip"></span><span class="label">定价</span></a>
+  <a href="#faq" data-target="faq"><span class="pip"></span><span class="label">FAQ</span></a>
+</nav>
+
+<main id="top">
+
+<!-- ============ 屏 01 · Hero ============ -->
+<section class="hero" data-rail="top">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-glow"></div>
+    <div class="collage" id="collage"></div>
+  </div>
+  <div class="wrap">
+    <a href="#engine" class="announce reveal">
+      <span class="dot"></span>新一代多模态内容引擎 · v3 已发布 <span class="dim">→</span>
+    </a>
+    <h1 class="h-display reveal">一句话，生成<br><span class="grad-text">一整条内容生产线</span></h1>
+    <p class="lead reveal">SuperX 用同一套 AI 引擎，帮你做短视频、拍短剧、上好一堂课，<br>也帮你把想法直接变成一个 App。</p>
+    <div class="hero-cta reveal">
+      <a href="#cta" class="btn btn-primary">免费开始创作</a>
+      <a href="#" class="btn btn-ghost"><span aria-hidden="true">▶</span> 看 90 秒演示</a>
+    </div>
+    <div class="hero-pills reveal">
+      <a href="#video"><i class="dot" style="background:var(--p1)"></i>AI 短视频</a>
+      <a href="#drama"><i class="dot" style="background:var(--p2)"></i>AI 短剧</a>
+      <a href="#education"><i class="dot" style="background:var(--p3)"></i>AI 教育</a>
+      <a href="#app"><i class="dot" style="background:var(--p4)"></i>AI App</a>
+    </div>
+    <div class="scroll-hint reveal"><span>向下滚动探索</span><span class="chevron" aria-hidden="true">⌄</span></div>
+  </div>
+</section>
+
+<!-- ============ 屏 02 · 我们是谁 ============ -->
+<section class="screen alt" id="about" data-rail="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="eyebrow"><span class="dot"></span>About SuperX</div>
+        <h2 class="h1">我们把「内容生产」<br>做成一件可以调用的事。</h2>
+        <p class="lead" style="margin-top:28px">
+          SuperX 成立于 20XX 年，团队来自影视工业、在线教育与基础模型研究。
+          我们相信未来每个团队都应该拥有自己的内容生产线，而不是排队等外包。
+        </p>
+        <a href="#engine" class="btn-text" style="margin-top:28px">了解我们的故事 <span class="arrow">→</span></a>
+      </div>
+      <div class="reveal">
+        <svg class="engine" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SuperX 引擎示意图：左侧输入经由中心引擎输出为视频、剧集、课程与应用">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#6C4CF5"/><stop offset="1" stop-color="#22D3EE"/>
+            </linearGradient>
+          </defs>
+          <!-- 输入 -->
+          <g opacity=".85">
+            <rect x="8" y="58" width="112" height="34" rx="9" stroke="rgba(255,255,255,.16)"/>
+            <text x="64" y="80" fill="#A6A8B8" font-size="12" text-anchor="middle" font-family="Inter,sans-serif">文字 / 链接</text>
+            <rect x="8" y="104" width="112" height="34" rx="9" stroke="rgba(255,255,255,.16)"/>
+            <text x="64" y="126" fill="#A6A8B8" font-size="12" text-anchor="middle" font-family="Inter,sans-serif">图片 / 视频</text>
+            <rect x="8" y="150" width="112" height="34" rx="9" stroke="rgba(255,255,255,.16)"/>
+            <text x="64" y="172" fill="#A6A8B8" font-size="12" text-anchor="middle" font-family="Inter,sans-serif">教材 / 文档</text>
+            <rect x="8" y="196" width="112" height="34" rx="9" stroke="rgba(255,255,255,.16)"/>
+            <text x="64" y="218" fill="#A6A8B8" font-size="12" text-anchor="middle" font-family="Inter,sans-serif">品牌知识库</text>
+          </g>
+          <!-- 输入连线 -->
+          <g stroke="rgba(255,255,255,.14)">
+            <path d="M120 75 C 160 75, 170 130, 205 143"/>
+            <path d="M120 121 C 160 121, 175 138, 205 145"/>
+            <path d="M120 167 C 160 167, 175 152, 205 149"/>
+            <path d="M120 213 C 160 213, 170 165, 205 152"/>
+          </g>
+          <!-- 核心 -->
+          <circle cx="260" cy="147" r="54" fill="rgba(108,76,245,.14)" stroke="url(#g1)" stroke-width="1.5"/>
+          <circle cx="260" cy="147" r="72" stroke="rgba(108,76,245,.25)" stroke-dasharray="4 7">
+            <animateTransform attributeName="transform" type="rotate" from="0 260 147" to="360 260 147" dur="24s" repeatCount="indefinite"/>
+          </circle>
+          <text x="260" y="143" fill="#F5F6FA" font-size="13" font-weight="700" text-anchor="middle" font-family="Space Grotesk,sans-serif">SuperX</text>
+          <text x="260" y="160" fill="#A6A8B8" font-size="11" text-anchor="middle" font-family="Space Grotesk,sans-serif">Engine</text>
+          <!-- 输出连线 -->
+          <g stroke-width="1.4" fill="none">
+            <path d="M314 130 C 350 110, 360 62, 398 58" stroke="#FF5A6E"/>
+            <path d="M318 142 C 356 136, 366 104, 398 102" stroke="#A855F7"/>
+            <path d="M318 154 C 356 160, 366 190, 398 194" stroke="#34D399"/>
+            <path d="M314 166 C 350 186, 360 234, 398 238" stroke="#F59E0B"/>
+          </g>
+          <!-- 输出 -->
+          <g font-size="12" font-family="Inter,sans-serif">
+            <circle cx="406" cy="58" r="4" fill="#FF5A6E"/><text x="418" y="62" fill="#F5F6FA">短视频</text>
+            <circle cx="406" cy="102" r="4" fill="#A855F7"/><text x="418" y="106" fill="#F5F6FA">短剧</text>
+            <circle cx="406" cy="194" r="4" fill="#34D399"/><text x="418" y="198" fill="#F5F6FA">课件 + 讲课</text>
+            <circle cx="406" cy="238" r="4" fill="#F59E0B"/><text x="418" y="242" fill="#F5F6FA">可运行应用</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="pillars">
+      <div class="card pillar reveal">
+        <div class="ico" aria-hidden="true">◈</div>
+        <h3 class="h3">一套引擎</h3>
+        <p class="muted" style="margin-top:10px;font-size:15px">四个场景共用同一底座，能力互相复用，不是四个独立工具的拼盘。</p>
+      </div>
+      <div class="card pillar reveal">
+        <div class="ico" aria-hidden="true">◆</div>
+        <h3 class="h3">工业级质量</h3>
+        <p class="muted" style="margin-top:10px;font-size:15px">不是玩具 demo，是能直接投放、直接上课、直接上线的成品。</p>
+      </div>
+      <div class="card pillar reveal">
+        <div class="ico" aria-hidden="true">◇</div>
+        <h3 class="h3">可控可复用</h3>
+        <p class="muted" style="margin-top:10px;font-size:15px">风格、角色、知识可以沉淀成资产，越用越贴合你的品牌。</p>
+      </div>
+    </div>
+
+    <div class="metrics reveal">
+      <div class="metric"><div class="num mono grad-text" data-count="2400" data-suffix=" 万+">0</div><div class="cap">累计生成视频</div></div>
+      <div class="metric"><div class="num mono grad-text" data-count="98" data-suffix="%">0</div><div class="cap">出片可用率</div></div>
+      <div class="metric"><div class="num mono grad-text" data-count="15" data-suffix=" 倍">0</div><div class="cap">生产提效</div></div>
+      <div class="metric"><div class="num mono grad-text" data-count="1200" data-suffix="+">0</div><div class="cap">服务团队</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 03 · 产品矩阵 ============ -->
+<section class="screen" id="products" data-rail="products">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="h1">四条产品线，一个底座</h2>
+      <p class="lead">选择你要的生产线，剩下的交给 SuperX Engine</p>
+    </div>
+    <div class="matrix">
+
+      <a class="card pcard reveal" href="#video" style="--accent:var(--p1);--accent-soft:rgba(255,90,110,.12)">
+        <div class="body">
+          <div class="idx">01</div>
+          <h3 class="h2">AI 短视频</h3>
+          <div class="en">SuperX Reels</div>
+          <p>一条产品链接 / 一段文案，批量产出可投放的竖屏短视频。脚本、分镜、配音、字幕一次到位。</p>
+        </div>
+        <div class="thumb">
+          <div style="display:flex;gap:8px;padding:14px;height:100%;justify-content:center">
+            <div style="flex:none;width:62px;border-radius:8px;background:linear-gradient(160deg,#FF5A6E33,#FF5A6E11);border:1px solid rgba(255,255,255,.08)"></div>
+            <div style="flex:none;width:62px;border-radius:8px;background:linear-gradient(160deg,#FF5A6E44,#FF5A6E11);border:1px solid rgba(255,255,255,.12)"></div>
+            <div style="flex:none;width:62px;border-radius:8px;background:linear-gradient(160deg,#FF5A6E33,#FF5A6E11);border:1px solid rgba(255,255,255,.08)"></div>
+          </div>
+        </div>
+        <div class="foot"><span class="btn-text">进入 AI 短视频 <span class="arrow">→</span></span></div>
+      </a>
+
+      <a class="card pcard reveal" href="#drama" style="--accent:var(--p2);--accent-soft:rgba(168,85,247,.12)">
+        <div class="body">
+          <div class="idx">02</div>
+          <h3 class="h2">AI 短剧</h3>
+          <div class="en">SuperX Drama</div>
+          <p>一句梗概生成分集剧本、固定角色、连续剧集，一周上线一部短剧。</p>
+        </div>
+        <div class="thumb">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:14px;height:100%">
+            <div style="border-radius:6px;background:linear-gradient(160deg,#A855F744,#A855F711)"></div>
+            <div style="border-radius:6px;background:linear-gradient(160deg,#A855F733,#A855F711)"></div>
+            <div style="border-radius:6px;background:linear-gradient(160deg,#A855F755,#A855F711)"></div>
+            <div style="border-radius:6px;background:linear-gradient(160deg,#A855F722,#A855F711)"></div>
+            <div style="border-radius:6px;background:linear-gradient(160deg,#A855F744,#A855F711)"></div>
+            <div style="border-radius:6px;background:linear-gradient(160deg,#A855F733,#A855F711)"></div>
+          </div>
+        </div>
+        <div class="foot"><span class="btn-text">进入 AI 短剧 <span class="arrow">→</span></span></div>
+      </a>
+
+      <a class="card pcard reveal" href="#education" style="--accent:var(--p3);--accent-soft:rgba(52,211,153,.12)">
+        <div class="body">
+          <div class="idx">03</div>
+          <h3 class="h2">AI 教育</h3>
+          <div class="en">SuperX Learn</div>
+          <p>上传大纲或教材，生成课件 + 数字讲师讲课视频 + 随堂练习题。</p>
+        </div>
+        <div class="thumb">
+          <div style="padding:16px;height:100%">
+            <div style="height:9px;width:52%;border-radius:4px;background:#34D39966;margin-bottom:10px"></div>
+            <div style="height:7px;width:88%;border-radius:4px;background:rgba(255,255,255,.1);margin-bottom:7px"></div>
+            <div style="height:7px;width:74%;border-radius:4px;background:rgba(255,255,255,.1);margin-bottom:12px"></div>
+            <div style="height:44px;border-radius:8px;background:linear-gradient(160deg,#34D39933,#34D39911);border:1px solid rgba(255,255,255,.08)"></div>
+          </div>
+        </div>
+        <div class="foot"><span class="btn-text">进入 AI 教育 <span class="arrow">→</span></span></div>
+      </a>
+
+      <a class="card pcard reveal" href="#app" style="--accent:var(--p4);--accent-soft:rgba(245,158,11,.12)">
+        <div class="body">
+          <div class="idx">04</div>
+          <h3 class="h2">AI App</h3>
+          <div class="en">SuperX Build · Vibe Coding</div>
+          <p>用说话的方式描述产品，直接得到可运行、可部署的应用。</p>
+        </div>
+        <div class="thumb">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px;height:100%">
+            <div class="mono" style="border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:9px;font-size:9px;color:#F59E0B;line-height:1.8">&gt; 做一个记账小程序<br><span style="color:#6B6D80">✓ 生成 4 个页面</span><br><span style="color:#6B6D80">⟳ 编写组件…</span></div>
+            <div style="border-radius:8px;background:linear-gradient(160deg,#F59E0B33,#F59E0B11);border:1px solid rgba(255,255,255,.08)"></div>
+          </div>
+        </div>
+        <div class="foot"><span class="btn-text">进入 AI App <span class="arrow">→</span></span></div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 04 · P1 AI 短视频 ============ -->
+<section class="screen alt" id="video" data-rail="video" style="--accent:var(--p1);--accent-soft:rgba(255,90,110,.12)">
+  <div class="wrap">
+    <div class="split">
+      <div class="split-text reveal">
+        <div class="eyebrow"><span class="dot"></span>产品线 01 / AI 短视频</div>
+        <h2 class="h1">一个链接进去，<br>30 条成片出来</h2>
+        <p class="lead" style="margin-top:24px">电商详情页、产品文档、一段文案，都能直接变成可投放的竖屏短视频。</p>
+        <ul class="feature-list">
+          <li><span class="tick">✓</span>自动拆解卖点 → 生成口播脚本，10 种爆款模板</li>
+          <li><span class="tick">✓</span>分镜编排 / 素材匹配 / 转场一步到位</li>
+          <li><span class="tick">✓</span>30+ 音色配音 + 智能字幕自动打轴</li>
+          <li><span class="tick">✓</span>一键适配抖音 / 视频号 / TikTok / Shorts</li>
+        </ul>
+        <a href="#cta" class="btn btn-accent">了解 AI 短视频</a>
+        <p class="split-stats">平均 4 分钟出片 · 支持 12 种语言 · 已生成 2,400 万条</p>
+      </div>
+      <div class="reveal">
+        <div class="phones">
+          <div class="phone" style="background:linear-gradient(165deg,#3A1620,#1A0B12)">
+            <div class="play" aria-hidden="true">▶</div>
+            <div class="cap">冬季新品 · 测评式口播</div><div class="bar"><i></i></div>
+          </div>
+          <div class="phone" style="background:linear-gradient(165deg,#5A1E2C,#24101A)">
+            <div class="play" aria-hidden="true">▶</div>
+            <div class="cap">爆款卖点拆解 · 15s</div><div class="bar"><i style="width:62%"></i></div>
+          </div>
+          <div class="phone" style="background:linear-gradient(165deg,#3A1620,#160A10)">
+            <div class="play" aria-hidden="true">▶</div>
+            <div class="cap">痛点式开场 · 竖屏</div><div class="bar"><i style="width:24%"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 05 · P2 AI 短剧 ============ -->
+<section class="screen" id="drama" data-rail="drama" style="--accent:var(--p2);--accent-soft:rgba(168,85,247,.12)">
+  <div class="wrap">
+    <div class="split mirror">
+      <div class="split-text reveal">
+        <div class="eyebrow"><span class="dot"></span>产品线 02 / AI 短剧</div>
+        <h2 class="h1">一句梗概，<br>一部 20 集短剧</h2>
+        <p class="lead" style="margin-top:24px">从故事梗概到成片，角色不跑脸，剧情不断线。</p>
+        <ul class="feature-list">
+          <li><span class="tick">✓</span>梗概 → 人物小传 → 分集大纲 → 完整剧本</li>
+          <li><span class="tick">✓</span>角色形象与音色锁定，跨集保持一致</li>
+          <li><span class="tick">✓</span>分镜、运镜、配乐、音效自动编排</li>
+          <li><span class="tick">✓</span>支持竖屏微短剧与横屏剧集双版输出</li>
+        </ul>
+        <a href="#cta" class="btn btn-accent">了解 AI 短剧</a>
+        <p class="split-stats">7 天一部 20 集短剧 · 同期产量 ×3 · 成本约为传统制作的 1/10</p>
+      </div>
+      <div class="reveal">
+        <div class="stage">
+          <div class="frame" id="dramaFrame" style="background:linear-gradient(150deg,#2A1240,#120A1E)">
+            <div class="play" aria-hidden="true">▶</div>
+            <div style="position:absolute;left:18px;bottom:16px">
+              <div class="mono" style="font-size:11px;color:#A855F7">EP03</div>
+              <div style="font-size:15px;font-weight:600" id="dramaTitle">雨夜对峙</div>
+            </div>
+          </div>
+          <div class="filmstrip" id="filmstrip" role="tablist" aria-label="剧集选择"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 06 · P3 AI 教育 ============ -->
+<section class="screen alt" id="education" data-rail="education" style="--accent:var(--p3);--accent-soft:rgba(52,211,153,.12)">
+  <div class="wrap">
+    <div class="split">
+      <div class="split-text reveal">
+        <div class="eyebrow"><span class="dot"></span>产品线 03 / AI 教育</div>
+        <h2 class="h1">备课 3 小时，<br>现在 3 分钟</h2>
+        <p class="lead" style="margin-top:24px">上传大纲或教材，课件、讲稿、讲课视频、练习题一次生成。</p>
+        <ul class="feature-list">
+          <li><span class="tick">✓</span>PPT / Word / PDF 导入，自动生成结构化课件</li>
+          <li><span class="tick">✓</span>数字讲师出镜讲课，口型同步、可克隆本人</li>
+          <li><span class="tick">✓</span>自动生成随堂练习、解析与知识点卡片</li>
+          <li><span class="tick">✓</span>覆盖 K12 / 高校 / 教培 / 企业内训</li>
+        </ul>
+        <a href="#cta" class="btn btn-accent">了解 AI 教育</a>
+        <p class="split-stats">输出 PPTX 与 MP4 · 可对接 LMS · 数据支持私有化部署</p>
+      </div>
+      <div class="reveal">
+        <div class="tabs">
+          <div class="tabbar" id="eduTabs" role="tablist">
+            <button class="on" role="tab" aria-selected="true">课件</button>
+            <button role="tab" aria-selected="false">讲课视频</button>
+            <button role="tab" aria-selected="false">练习题</button>
+            <span class="ink"></span>
+          </div>
+
+          <div class="tabpanel on" role="tabpanel">
+            <div class="dim mono" style="font-size:11px;margin-bottom:14px">第 3 页 / 共 24 页 · 牛顿第二定律</div>
+            <div style="height:12px;width:56%;border-radius:5px;background:#34D39988;margin-bottom:16px"></div>
+            <div style="height:8px;width:92%;border-radius:4px;background:rgba(255,255,255,.1);margin-bottom:9px"></div>
+            <div style="height:8px;width:80%;border-radius:4px;background:rgba(255,255,255,.1);margin-bottom:9px"></div>
+            <div style="height:8px;width:86%;border-radius:4px;background:rgba(255,255,255,.1);margin-bottom:18px"></div>
+            <div style="height:92px;border-radius:10px;background:linear-gradient(150deg,rgba(52,211,153,.18),rgba(52,211,153,.04));border:1px solid var(--line);display:grid;place-items:center" class="mono dim">F = m · a　板书示意图</div>
+            <div style="margin-top:16px;display:flex;gap:10px"><span class="chip btn-sm">导出 PPTX</span><span class="chip btn-sm">导出 PDF</span></div>
+          </div>
+
+          <div class="tabpanel" role="tabpanel">
+            <div style="display:grid;grid-template-columns:1fr 1.25fr;gap:14px">
+              <div style="aspect-ratio:3/4;border-radius:10px;background:linear-gradient(160deg,#10382C,#0A1B17);border:1px solid var(--line);display:grid;place-items:end center;padding-bottom:12px" class="dim mono">数字讲师</div>
+              <div style="border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--line);padding:14px">
+                <div style="height:9px;width:60%;border-radius:4px;background:#34D39977;margin-bottom:12px"></div>
+                <div style="height:7px;width:90%;border-radius:4px;background:rgba(255,255,255,.1);margin-bottom:8px"></div>
+                <div style="height:7px;width:72%;border-radius:4px;background:rgba(255,255,255,.1)"></div>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;align-items:center;gap:12px">
+              <span aria-hidden="true">▶</span>
+              <div style="flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.12)"><i style="display:block;width:22%;height:100%;border-radius:2px;background:var(--p3)"></i></div>
+              <span class="mono dim" style="font-size:12px">00:12 / 08:40</span>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px"><span class="chip btn-sm">导出 MP4</span><span class="chip btn-sm">导出 SCORM</span></div>
+          </div>
+
+          <div class="tabpanel" role="tabpanel">
+            <div style="display:grid;gap:12px">
+              <div style="border:1px solid var(--line);border-radius:10px;padding:14px">
+                <div style="font-size:14px;margin-bottom:10px"><b class="mono" style="color:var(--p3)">Q1</b> 单选 · 质量不变时，合力增大一倍，加速度将…</div>
+                <div style="display:grid;gap:7px">
+                  <div style="height:8px;width:46%;border-radius:4px;background:rgba(255,255,255,.1)"></div>
+                  <div style="height:8px;width:38%;border-radius:4px;background:rgba(52,211,153,.5)"></div>
+                  <div style="height:8px;width:52%;border-radius:4px;background:rgba(255,255,255,.1)"></div>
+                </div>
+              </div>
+              <div style="border:1px solid var(--line);border-radius:10px;padding:14px">
+                <div style="font-size:14px"><b class="mono" style="color:var(--p3)">Q2</b> 判断 · 物体不受力时一定静止</div>
+              </div>
+              <div style="border:1px solid var(--line);border-radius:10px;padding:14px">
+                <div style="font-size:14px"><b class="mono" style="color:var(--p3)">Q3</b> 计算 · 求 2kg 物体在 6N 合力下的加速度</div>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px"><span class="chip btn-sm">逐题解析</span><span class="chip btn-sm">导出题库</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 07 · P4 AI App ============ -->
+<section class="screen" id="app" data-rail="app" style="--accent:var(--p4);--accent-soft:rgba(245,158,11,.12)">
+  <div class="wrap">
+    <div class="split mirror">
+      <div class="split-text reveal">
+        <div class="eyebrow"><span class="dot"></span>产品线 04 / AI App（Vibe Coding）</div>
+        <h2 class="h1">想到什么，<br>就说出来</h2>
+        <p class="lead" style="margin-top:24px">用自然语言描述产品，直接得到可运行、可部署的应用。</p>
+        <ul class="feature-list">
+          <li><span class="tick">✓</span>自然语言描述即可开工，无需写一行代码</li>
+          <li><span class="tick">✓</span>前端、后端、数据库自动搭好并连通</li>
+          <li><span class="tick">✓</span>改一句话，界面立刻跟着变</li>
+          <li><span class="tick">✓</span>一键部署带自定义域名，可导出源码不锁定</li>
+        </ul>
+        <a href="#cta" class="btn btn-accent">了解 AI App</a>
+        <p class="split-stats">平均 90 秒出可运行版本 · 已构建 40,000+ 应用</p>
+      </div>
+      <div class="reveal">
+        <div class="ide">
+          <div class="pane">
+            <div class="pane-head"><span class="dots"><i></i><i></i><i></i></span> 对话 / 生成日志</div>
+            <div class="chatlog mono" id="chatlog"></div>
+          </div>
+          <div class="pane">
+            <div class="pane-head" style="justify-content:space-between">
+              <span>实时预览</span>
+              <span class="dim" style="font-size:11px">手机 · 平板 · 桌面</span>
+            </div>
+            <div class="mockapp" id="mockapp">
+              <div class="row" style="width:52%"></div>
+              <div class="row" style="width:84%"></div>
+              <div class="blocks"><div></div><div></div><div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 08 · SuperX Engine ============ -->
+<section class="screen alt" id="engine" data-rail="engine">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="h1">为什么四件事能由一家公司做好</h2>
+      <p class="lead">因为它们共用同一个引擎</p>
+    </div>
+
+    <div class="engine-wrap reveal">
+      <div class="engine-cols">
+        <div class="engine-box">
+          <h4>输入层</h4>
+          <ul>
+            <li><span class="dim">▤</span>文字 / 链接</li>
+            <li><span class="dim">▤</span>图片 / 视频</li>
+            <li><span class="dim">▤</span>教材 / 文档</li>
+            <li><span class="dim">▤</span>品牌知识库</li>
+          </ul>
+          <div class="wire" style="margin-top:18px"><i></i><i style="animation-delay:.9s"></i><i style="animation-delay:1.8s"></i></div>
+        </div>
+
+        <div class="engine-core">
+          <div class="name grad-text">SuperX Engine</div>
+          <ul>
+            <li>多模态理解</li>
+            <li>剧本与结构化生成</li>
+            <li>角色与风格一致性</li>
+            <li>语音与口型合成</li>
+            <li>代码生成与编排</li>
+            <li>质量与合规审校</li>
+          </ul>
+        </div>
+
+        <div class="engine-box">
+          <h4>输出层</h4>
+          <div class="wire" style="margin-bottom:18px"><i></i><i style="animation-delay:1.3s"></i></div>
+          <div class="out-line"><i class="dot" style="background:var(--p1)"></i>短视频</div>
+          <div class="out-line"><i class="dot" style="background:var(--p2)"></i>短剧</div>
+          <div class="out-line"><i class="dot" style="background:var(--p3)"></i>课件 + 讲课视频</div>
+          <div class="out-line"><i class="dot" style="background:var(--p4)"></i>可运行应用</div>
+        </div>
+      </div>
+
+      <div class="engine-badges">
+        <div>私有化部署</div>
+        <div>数据不出域</div>
+        <div>企业级 SLA</div>
+        <div>开放 API</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 09 · 三步流程 ============ -->
+<section class="screen" id="how" data-rail="how">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="h1">上手只需要三步</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="n">1</div>
+        <h3 class="h3">描述你要什么</h3>
+        <p>一句话、一个链接、一份大纲都行，不需要学任何参数。</p>
+      </div>
+      <div class="step reveal">
+        <div class="n">2</div>
+        <h3 class="h3">AI 生成草案</h3>
+        <p>脚本、分镜、课件、界面，几分钟内拿到第一版完整产出。</p>
+      </div>
+      <div class="step reveal">
+        <div class="n">3</div>
+        <h3 class="h3">微调并发布</h3>
+        <p>改词、换音色、换镜头，满意后导出或一键分发到各平台。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 10 · 案例 ============ -->
+<section class="screen alt" id="cases" data-rail="cases">
+  <div class="wrap">
+    <div class="section-head reveal" style="margin-bottom:40px">
+      <h2 class="h2">已有 1,200+ 团队在 SuperX 上生产内容</h2>
+    </div>
+  </div>
+
+  <div class="marquee reveal" aria-hidden="true">
+    <div class="marquee-track" id="logoTrack"></div>
+  </div>
+
+  <div class="wrap" style="margin-top:72px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px" class="reveal">
+      <h2 class="h2">客户案例</h2>
+      <a href="#" class="btn-text">查看全部案例 <span class="arrow">→</span></a>
+    </div>
+
+    <div class="cases">
+      <a class="card case reveal" href="#" style="--accent:var(--p1)">
+        <div class="cover" style="background:linear-gradient(150deg,#4A1A24,#170C12)"></div>
+        <span class="tag" style="--accent-soft:rgba(255,90,110,.12);--accent:var(--p1)"><i class="dot"></i>电商 / 短视频</span>
+        <h3>投放素材成本下降 72%</h3>
+        <p class="who">某头部美妆品牌 · 内容负责人</p>
+        <p style="margin-top:18px"><span class="btn-text">阅读案例 <span class="arrow">→</span></span></p>
+      </a>
+      <a class="card case reveal" href="#" style="--accent:var(--p2)">
+        <div class="cover" style="background:linear-gradient(150deg,#341547,#150B1F)"></div>
+        <span class="tag" style="--accent-soft:rgba(168,85,247,.12);--accent:var(--p2)"><i class="dot"></i>MCN / 短剧</span>
+        <h3>两周上线三部微短剧</h3>
+        <p class="who">某 MCN 机构 · 制片人</p>
+        <p style="margin-top:18px"><span class="btn-text">阅读案例 <span class="arrow">→</span></span></p>
+      </a>
+      <a class="card case reveal" href="#" style="--accent:var(--p3)">
+        <div class="cover" style="background:linear-gradient(150deg,#123A2E,#0B1C18)"></div>
+        <span class="tag" style="--accent-soft:rgba(52,211,153,.12);--accent:var(--p3)"><i class="dot"></i>高校 / 教育</span>
+        <h3>一学期 120 节课全部自动备课</h3>
+        <p class="who">某双一流高校 · 教务处</p>
+        <p style="margin-top:18px"><span class="btn-text">阅读案例 <span class="arrow">→</span></span></p>
+      </a>
+    </div>
+
+    <div class="quote reveal">
+      <div class="avatar" aria-hidden="true"></div>
+      <div>
+        <p class="q">「SuperX 让我们的内容团队从 12 人缩到 4 人，产量反而翻了三倍。」</p>
+        <p class="who" style="margin-top:14px">张某某 · 某公司内容负责人</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 屏 11 · 定价 ============ -->
+<section class="screen" id="pricing" data-rail="pricing">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="h1">按需选择，随时升级</h2>
+      <div style="margin-top:28px">
+        <div class="toggle" id="billing">
+          <button class="on" data-mode="monthly">月付</button>
+          <button data-mode="yearly">年付<span class="save">-20%</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="plans">
+      <div class="card plan reveal">
+        <div class="pname">免费体验</div>
+        <div class="price" data-monthly="¥0" data-yearly="¥0">¥0</div>
+        <div class="dim" style="font-size:13px">无需信用卡</div>
+        <ul>
+          <li>每月 20 条生成额度</li>
+          <li>成片带水印</li>
+          <li>基础音色与模板</li>
+          <li>社区支持</li>
+        </ul>
+        <a href="#cta" class="btn btn-ghost">开始使用</a>
+      </div>
+
+      <div class="card plan featured reveal">
+        <div class="ribbon">★ 推荐</div>
+        <div class="pname">创作者</div>
+        <div class="price" data-monthly="¥199" data-yearly="¥159">¥199<small> /月</small></div>
+        <div class="dim" style="font-size:13px">适合个人与小团队</div>
+        <ul>
+          <li>每月 500 条生成额度</li>
+          <li>无水印、4K 导出</li>
+          <li>全部音色与数字人</li>
+          <li>四条产品线全部可用</li>
+        </ul>
+        <a href="#cta" class="btn btn-primary">立即订阅</a>
+      </div>
+
+      <div class="card plan reveal">
+        <div class="pname">团队版</div>
+        <div class="price" data-monthly="¥999" data-yearly="¥799">¥999<small> /月</small></div>
+        <div class="dim" style="font-size:13px">适合内容团队</div>
+        <ul>
+          <li>不限量生成</li>
+          <li>多人协作与审批</li>
+          <li>品牌知识库 / 角色库</li>
+          <li>开放 API 接入</li>
+        </ul>
+        <a href="#cta" class="btn btn-ghost">立即订阅</a>
+      </div>
+
+      <div class="card plan reveal">
+        <div class="pname">企业定制</div>
+        <div class="price" data-monthly="面议" data-yearly="面议">面议</div>
+        <div class="dim" style="font-size:13px">适合大型组织</div>
+        <ul>
+          <li>私有化部署，数据不出域</li>
+          <li>专属模型微调</li>
+          <li>专属客户成功经理</li>
+          <li>企业级 SLA 保障</li>
+        </ul>
+        <a href="#cta" class="btn btn-ghost">联系销售</a>
+      </div>
+    </div>
+
+    <p class="pricing-note reveal">一个账号通用四条产品线，不按业务线重复收费 · <a href="#" class="btn-text" style="font-size:14px">查看完整定价与用量说明 <span class="arrow">→</span></a></p>
+  </div>
+</section>
+
+<!-- ============ 屏 12 · FAQ + CTA ============ -->
+<section class="screen alt" id="faq" data-rail="faq">
+  <div class="wrap">
+    <div class="section-head reveal"><h2 class="h1">常见问题</h2></div>
+
+    <div class="faq reveal">
+      <details>
+        <summary>生成的内容版权归谁？<span class="plus" aria-hidden="true"></span></summary>
+        <div class="answer">你用 SuperX 生成的成片、课件与应用，商用权利归你所有。我们只保留为改进服务所需的匿名统计信息，付费套餐可关闭全部数据留存。</div>
+      </details>
+      <details>
+        <summary>可以用我自己的品牌素材和角色形象吗？<span class="plus" aria-hidden="true"></span></summary>
+        <div class="answer">可以。团队版起支持品牌知识库与角色库：上传 Logo、字体、配色、产品图与真人形象后，后续所有生成都会自动沿用，跨条目保持一致。</div>
+      </details>
+      <details>
+        <summary>支持私有化部署吗？数据会被用于训练吗？<span class="plus" aria-hidden="true"></span></summary>
+        <div class="answer">企业版支持私有化部署，数据全程不出域。默认情况下我们不会用你的数据训练模型，合同中可写明该条款。</div>
+      </details>
+      <details>
+        <summary>四条产品线要分开付费吗？<span class="plus" aria-hidden="true"></span></summary>
+        <div class="answer">不需要。一个账号通用四条产品线，额度在它们之间共享，不按业务线重复收费。</div>
+      </details>
+      <details>
+        <summary>生成一条短视频 / 一集短剧大概需要多久？<span class="plus" aria-hidden="true"></span></summary>
+        <div class="answer">短视频平均 4 分钟出片，批量任务并行处理；一集短剧（约 2 分钟成片）通常在 30 分钟内完成，含剧本、分镜、配音与调色。</div>
+      </details>
+    </div>
+
+    <div class="cta-box reveal" id="cta">
+      <h2 class="h1">现在就开始你的第一条生产线</h2>
+      <p class="lead">免费额度无需信用卡，5 分钟出第一条成片</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-primary">免费开始</a>
+        <a href="#" class="btn btn-ghost">预约 1 对 1 演示</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ 页脚 ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#top" class="logo"><span class="mark"></span>SuperX</a>
+        <p class="lead">一个 AI 内容引擎，四条产品线。</p>
+        <div class="socials">
+          <a href="#" aria-label="微博">微博</a>
+          <a href="#" aria-label="哔哩哔哩">B站</a>
+          <a href="#" aria-label="X">X</a>
+          <a href="#" aria-label="YouTube">YT</a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>产品</h4>
+        <a href="#video">AI 短视频</a>
+        <a href="#drama">AI 短剧</a>
+        <a href="#education">AI 教育</a>
+        <a href="#app">AI App</a>
+      </div>
+      <div class="foot-col">
+        <h4>公司</h4>
+        <a href="#about">关于我们</a>
+        <a href="#">加入我们</a>
+        <a href="#">里程碑</a>
+        <a href="#">品牌资料</a>
+      </div>
+      <div class="foot-col">
+        <h4>资源</h4>
+        <a href="#">文档</a>
+        <a href="#">博客</a>
+        <a href="#">帮助中心</a>
+        <a href="#">更新日志</a>
+      </div>
+      <div class="foot-col">
+        <h4>联系</h4>
+        <a href="#">商务合作</a>
+        <a href="#">媒体咨询</a>
+        <a href="#">微信公众号</a>
+        <a href="#">邮箱</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 SuperX Technology</span>
+      <span><a href="#">隐私政策</a> · <a href="#">服务条款</a> · 京ICP备XXXXXXXX号</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
