@@ -19,13 +19,47 @@ npx http-server . -p 8080
 
 ```
 index.html              官网首页，12 屏
-studio.html             创作工作台（AI 短视频模式）
+studio.html             创作工作台（短视频 / 短剧两个模式）
+login.html              登录 / 注册 / 找回密码
+assets/img/logo.png     SUPERX INDO 字标（透明底，3x）
 assets/css/styles.css   官网设计系统 + 各屏样式 + 响应式
 assets/css/studio.css   工作台设计系统（密度更高）+ 三栏布局
+assets/css/login.css    登录页布局
 assets/js/main.js       官网交互
 assets/js/studio.js     工作台交互 + 演示流程 + 假数据
+assets/js/login.js      登录页交互
+assets/js/auth.js       登录态（localStorage，三个页面共用）
 docs/design/            设计稿（plaintext 线框），实现以此为准
 ```
+
+## 登录
+
+`login.html` 三个视图：登录 / 注册 / 找回密码，含字段校验、密码显隐、
+提交 loading、Google 与 Apple 占位入口。
+
+**这是外观演示，不校验真实凭据**：任何合法邮箱 + 8 位以上密码即可进入。
+登录态只写 `localStorage`（`assets/js/auth.js`），不发任何网络请求。
+接后端时替换 `SuperXAuth.signIn` 即可。
+
+未登录也能进工作台随便逛，**点发送生成时才拦一次**，且可以选「先看一遍演示」
+继续看完整流程（对应设计稿 `05-studio.md §0`：先让人摸到东西，再要账号）。
+
+## 品牌
+
+字标为 SUPERX INDO，从提供的白底 PNG 反解 alpha 抠成透明底并保留原始渐变
+（`#015EC2 → #01A9B3`）。站点主色已对齐字标：
+
+```
+--violet: #0B62CE    --cyan: #12B5C0
+--grad: linear-gradient(100deg, #0B62CE 0%, #12B5C0 100%)
+```
+
+四条产品线辅色不变（`#FF5A6E` / `#A855F7` / `#34D399` / `#F59E0B`）。
+
+站点面向海外部署，已移除只在中国成立的元素：投放平台改为
+TikTok / Instagram Reels / YouTube Shorts，电商链接改为 Shopee / Tokopedia / Lazada，
+定价改为美元，页脚去掉 ICP 备案、社交换成 IG / TikTok / LinkedIn，
+案例主体与人名改为中性/本地化命名。
 
 ## 两个页面怎么串起来
 

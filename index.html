@@ -9,14 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='5' transform='rotate(45 16 16)' fill='%236C4CF5'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='5' transform='rotate(45 16 16)' fill='%230B62CE'/></svg>">
 </head>
 <body>
 
 <!-- ============ 全局导航 ============ -->
 <header class="nav" id="nav">
   <div class="wrap">
-    <a href="#top" class="logo"><span class="mark"></span>SuperX</a>
+    <a href="#top" class="logo"><img src="assets/img/logo.png" alt="SUPERX INDO"></a>
 
     <ul class="nav-links">
       <li>
@@ -51,7 +51,7 @@
     </ul>
 
     <div class="nav-actions">
-      <a href="#" class="muted">登录</a>
+      <a href="login.html" class="muted" id="navAuth">登录</a>
       <a href="#cta" class="btn btn-primary btn-sm">预约演示</a>
     </div>
 
@@ -69,7 +69,7 @@
     <a href="#cases">案例</a>
     <a href="#pricing">定价</a>
     <a href="#about">关于</a>
-    <a href="#">登录</a>
+    <a href="login.html">登录</a>
   </div>
   <a href="#cta" class="btn btn-primary" style="width:100%;margin-top:18px">预约演示</a>
 </nav>
@@ -135,7 +135,7 @@
         <svg class="engine" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SuperX 引擎示意图：左侧输入经由中心引擎输出为视频、剧集、课程与应用">
           <defs>
             <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#6C4CF5"/><stop offset="1" stop-color="#22D3EE"/>
+              <stop offset="0" stop-color="#0B62CE"/><stop offset="1" stop-color="#12B5C0"/>
             </linearGradient>
           </defs>
           <!-- 输入 -->
@@ -157,8 +157,8 @@
             <path d="M120 213 C 160 213, 170 165, 205 152"/>
           </g>
           <!-- 核心 -->
-          <circle cx="260" cy="147" r="54" fill="rgba(108,76,245,.14)" stroke="url(#g1)" stroke-width="1.5"/>
-          <circle cx="260" cy="147" r="72" stroke="rgba(108,76,245,.25)" stroke-dasharray="4 7">
+          <circle cx="260" cy="147" r="54" fill="rgba(11,98,206,.16)" stroke="url(#g1)" stroke-width="1.5"/>
+          <circle cx="260" cy="147" r="72" stroke="rgba(11,98,206,.28)" stroke-dasharray="4 7">
             <animateTransform attributeName="transform" type="rotate" from="0 260 147" to="360 260 147" dur="24s" repeatCount="indefinite"/>
           </circle>
           <text x="260" y="143" fill="#F5F6FA" font-size="13" font-weight="700" text-anchor="middle" font-family="Space Grotesk,sans-serif">SuperX</text>
@@ -304,7 +304,7 @@
           <li><span class="tick">✓</span>自动拆解卖点 → 生成口播脚本，10 种爆款模板</li>
           <li><span class="tick">✓</span>分镜编排 / 素材匹配 / 转场一步到位</li>
           <li><span class="tick">✓</span>30+ 音色配音 + 智能字幕自动打轴</li>
-          <li><span class="tick">✓</span>一键适配抖音 / 视频号 / TikTok / Shorts</li>
+          <li><span class="tick">✓</span>一键适配 TikTok / Instagram Reels / YouTube Shorts</li>
         </ul>
         <a href="studio.html?mode=video" class="btn btn-accent">开始做短视频</a>
         <a href="#cta" class="btn-text" style="margin-left:18px">了解更多 <span class="arrow">→</span></a>
@@ -591,16 +591,16 @@
       </a>
       <a class="card case reveal" href="#" style="--accent:var(--p2)">
         <div class="cover" style="background:linear-gradient(150deg,#341547,#150B1F)"></div>
-        <span class="tag" style="--accent-soft:rgba(168,85,247,.12);--accent:var(--p2)"><i class="dot"></i>MCN / 短剧</span>
+        <span class="tag" style="--accent-soft:rgba(168,85,247,.12);--accent:var(--p2)"><i class="dot"></i>内容工作室 / 短剧</span>
         <h3>两周上线三部微短剧</h3>
-        <p class="who">某 MCN 机构 · 制片人</p>
+        <p class="who">某内容工作室 · 制片人</p>
         <p style="margin-top:18px"><span class="btn-text">阅读案例 <span class="arrow">→</span></span></p>
       </a>
       <a class="card case reveal" href="#" style="--accent:var(--p3)">
         <div class="cover" style="background:linear-gradient(150deg,#123A2E,#0B1C18)"></div>
         <span class="tag" style="--accent-soft:rgba(52,211,153,.12);--accent:var(--p3)"><i class="dot"></i>高校 / 教育</span>
         <h3>一学期 120 节课全部自动备课</h3>
-        <p class="who">某双一流高校 · 教务处</p>
+        <p class="who">某公立大学 · 教务处</p>
         <p style="margin-top:18px"><span class="btn-text">阅读案例 <span class="arrow">→</span></span></p>
       </a>
     </div>
@@ -609,7 +609,7 @@
       <div class="avatar" aria-hidden="true"></div>
       <div>
         <p class="q">「SuperX 让我们的内容团队从 12 人缩到 4 人，产量反而翻了三倍。」</p>
-        <p class="who" style="margin-top:14px">张某某 · 某公司内容负责人</p>
+        <p class="who" style="margin-top:14px">Dewi S. · 某公司内容负责人</p>
       </div>
     </div>
   </div>
@@ -631,7 +631,7 @@
     <div class="plans">
       <div class="card plan reveal">
         <div class="pname">免费体验</div>
-        <div class="price" data-monthly="¥0" data-yearly="¥0">¥0</div>
+        <div class="price" data-monthly="$0" data-yearly="$0">$0</div>
         <div class="dim" style="font-size:13px">无需信用卡</div>
         <ul>
           <li>每月 20 条生成额度</li>
@@ -645,7 +645,7 @@
       <div class="card plan featured reveal">
         <div class="ribbon">★ 推荐</div>
         <div class="pname">创作者</div>
-        <div class="price" data-monthly="¥199" data-yearly="¥159">¥199<small> /月</small></div>
+        <div class="price" data-monthly="$29" data-yearly="$23">$29<small> /月</small></div>
         <div class="dim" style="font-size:13px">适合个人与小团队</div>
         <ul>
           <li>每月 500 条生成额度</li>
@@ -658,7 +658,7 @@
 
       <div class="card plan reveal">
         <div class="pname">团队版</div>
-        <div class="price" data-monthly="¥999" data-yearly="¥799">¥999<small> /月</small></div>
+        <div class="price" data-monthly="$149" data-yearly="$119">$149<small> /月</small></div>
         <div class="dim" style="font-size:13px">适合内容团队</div>
         <ul>
           <li>不限量生成</li>
@@ -733,11 +733,11 @@
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <a href="#top" class="logo"><span class="mark"></span>SuperX</a>
+        <a href="#top" class="logo"><img src="assets/img/logo.png" alt="SUPERX INDO"></a>
         <p class="lead">一个 AI 内容引擎，四条产品线。</p>
         <div class="socials">
-          <a href="#" aria-label="微博">微博</a>
-          <a href="#" aria-label="哔哩哔哩">B站</a>
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="TikTok">TT</a>
           <a href="#" aria-label="X">X</a>
           <a href="#" aria-label="YouTube">YT</a>
         </div>
@@ -767,17 +767,18 @@
         <h4>联系</h4>
         <a href="#">商务合作</a>
         <a href="#">媒体咨询</a>
-        <a href="#">微信公众号</a>
+        <a href="#">LinkedIn</a>
         <a href="#">邮箱</a>
       </div>
     </div>
     <div class="foot-bottom">
       <span>© 2026 SuperX Technology</span>
-      <span><a href="#">隐私政策</a> · <a href="#">服务条款</a> · 京ICP备XXXXXXXX号</span>
+      <span><a href="#">隐私政策</a> · <a href="#">服务条款</a> · <a href="#">Cookie 设置</a></span>
     </div>
   </div>
 </footer>
 
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

@@ -65,6 +65,49 @@
   window.addEventListener('resize', applyWidth);
   if (window.innerWidth <= 1024) setSide(false);
 
+  /* ---------- 登录态 ---------- */
+  var Auth = window.SuperXAuth;
+  var nextUrl = 'studio.html' + (mode === 'video' ? '' : '?mode=' + mode);
+  var loginUrl = 'login.html?next=' + encodeURIComponent(nextUrl);
+
+  function renderFoot() {
+    var u = Auth.get(), host = $('#navFoot');
+    if (u) {
+      var pct = Math.round(u.quota.used / u.quota.total * 100);
+      host.innerHTML =
+        '<div class="user-row"><div class="avatar avatar-txt">' + Auth.initial(u) + '</div>' +
+        '<div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:500;overflow:hidden;' +
+        'text-overflow:ellipsis;white-space:nowrap">' + esc(u.name) + '</div>' +
+        '<div class="dim" style="font-size:11px">' + u.plan + ' · ' + u.quota.used + '/' + u.quota.total + ' 额度</div></div>' +
+        '<button class="signout" id="signOut" title="退出登录">退出</button></div>' +
+        '<div class="quota"><i style="width:' + pct + '%"></i></div>' +
+        '<button class="upgrade">🚀 升级到创作者</button>';
+      $('#signOut').addEventListener('click', function () {
+        Auth.signOut(); renderFoot(); toast('已退出登录');
+      });
+    } else {
+      host.innerHTML =
+        '<p class="anon">未登录 · 可以随便逛，<br>生成时再登录就行。</p>' +
+        '<a class="signin-btn" href="' + loginUrl + '">登录 / 注册</a>';
+    }
+  }
+  renderFoot();
+
+  /* ---------- 未登录拦截 ---------- */
+  var gate = document.createElement('div');
+  gate.className = 'modal-scrim';
+  gate.innerHTML =
+    '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="gateTitle">' +
+    '<h3 id="gateTitle">登录后开始生成</h3>' +
+    '<p>生成会消耗额度，所以需要一个账号。新账号赠 20 条免费额度，无需信用卡。</p>' +
+    '<div class="acts"><a class="go" href="' + loginUrl + '">去登录 / 注册</a>' +
+    '<button class="later" id="gateLater">先看一遍演示（不消耗额度）</button></div></div>';
+  document.body.appendChild(gate);
+
+  function closeGate() { gate.classList.remove('on'); }
+  gate.addEventListener('click', function (e) { if (e.target === gate) closeGate(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeGate(); });
+
   // 模式菜单
   var modeMenu = $('#modeMenu'), newChat = $('#newChat');
   newChat.addEventListener('click', function (e) {
@@ -148,10 +191,10 @@
     chips.appendChild(c);
   }
   $('#addBtn').addEventListener('click', function () {
-    addChip(mode === 'drama' ? '📄 故事梗概.docx' : '🔗 tmall.com/item/8823…');
+    addChip(mode === 'drama' ? '📄 故事梗概.docx' : '🔗 shopee.co.id/p/8823…');
   });
   $('#atBtn').addEventListener('click', function () {
-    input.value += (input.value ? ' ' : '') + (mode === 'drama' ? '@林晚 ' : '@脚本③ ');
+    input.value += (input.value ? ' ' : '') + (mode === 'drama' ? '@Maya ' : '@脚本③ ');
     input.focus(); autosize();
     toast(mode === 'drama' ? '可以 @ 角色、某一集、剧本或世界观设定' : '可以 @ 脚本、成片、角色或品牌知识库');
   });
@@ -231,9 +274,16 @@
   }
   sendBtn.addEventListener('click', onSend);
 
+  var gateSeen = false;
   function onSend() {
     if (state.running) { state.abort = true; return; }
     if (!M.ready) { toast('「' + M.name + '」模式的工作台还没做，可以先看 AI 短视频或 AI 短剧'); return; }
+    // 未登录：第一次点生成时拦一下，但允许继续看演示
+    if (!Auth.isIn() && !gateSeen) {
+      gate.classList.add('on');
+      $('#gateLater').onclick = function () { gateSeen = true; closeGate(); onSend(); };
+      return;
+    }
     var text = input.value.trim() || IMPL.defaultPrompt;
     var attach = $$('.chip-a', chips).map(function (c) { return c.textContent.replace('✕', '').trim(); });
     input.value = ''; autosize(); chips.innerHTML = '';
@@ -317,7 +367,7 @@
       host.innerHTML =
         '<div class="empty-label" style="margin-top:0">从这些开始 ——</div>' +
         '<div class="starter-grid">' +
-          '<button class="starter" data-s="link"><div class="ico">🔗</div><b>商品链接出片</b><span>粘贴淘宝 / 京东 / 抖音小店链接</span></button>' +
+          '<button class="starter" data-s="link"><div class="ico">🔗</div><b>商品链接出片</b><span>粘贴 Shopee / Tokopedia / Lazada 链接</span></button>' +
           '<button class="starter" data-s="copy"><div class="ico">📝</div><b>一段文案出片</b><span>已经写好卖点了，直接排片</span></button>' +
           '<button class="starter" data-s="ref"><div class="ico">🎯</div><b>竞品同款</b><span>发一条参考视频，做同结构的</span></button>' +
         '</div>' +
@@ -331,7 +381,7 @@
       $$('.starter', host).forEach(function (b) {
         b.addEventListener('click', function () {
           var k = b.getAttribute('data-s');
-          if (k === 'link') { addChip('🔗 tmall.com/item/8823…'); input.value = '用这个链接做 5 条投放素材，主打保湿，要痛点式开场'; }
+          if (k === 'link') { addChip('🔗 shopee.co.id/p/8823…'); input.value = '用这个链接做 5 条投放素材，主打保湿，要痛点式开场'; }
           if (k === 'copy') { input.value = '这段文案帮我做成 5 条短视频：五重玻尿酸复配、零香精零酒精、pH 5.5…'; }
           if (k === 'ref') { addChip('🎬 参考视频.mp4'); input.value = '照这条的结构做 5 条同款，换成我的产品'; }
           autosize(); input.focus();
@@ -344,7 +394,7 @@
 
     function renderParams(host) {
       host.innerHTML =
-        row('平台', ['抖音*', '视频号', '小红书', 'TikTok']) +
+        row('平台', ['TikTok*', 'Instagram Reels', 'YouTube Shorts', 'Facebook']) +
         row('时长', ['15s', '15–30s*', '60s']) +
         row('口播风格', ['痛点式*', '测评式', '故事式', '对比式', '清单式']) +
         row('音色', ['温柔女声*', '活力女声', '沉稳男声', '克隆我的声音']) +
@@ -354,7 +404,7 @@
 
     async function run(text, attach) {
       setRunning(true);
-      userMsg(text, attach.length ? attach : ['🔗 tmall.com/item/8823…']);
+      userMsg(text, attach.length ? attach : ['🔗 shopee.co.id/p/8823…']);
       await sleep(500); if (state.abort) return stopped();
 
       var b = agentBlock();
@@ -363,7 +413,7 @@
       s1.done(3);
 
       var s2 = addStep(b, '分析商品页',
-        '<div class="tool"><b>🔧 read_url</b> tmall.com/item/8823…</div>' +
+        '<div class="tool"><b>🔧 read_url</b> shopee.co.id/p/8823…</div>' +
         '<div class="res">→ 标题、价格、主图 8 张、详情页文案 1,240 字</div>' +
         '<div class="tool"><b>🔧 extract_selling_points</b></div>' +
         '<div class="res">→ 6 个卖点：五重玻尿酸 / 24h 保湿 / 无香精 / pH 5.5 / 不搓泥 / 大容量</div>');
@@ -597,7 +647,7 @@
         '</div><div class="sec-label">来源</div><p class="dim" style="font-size:12.5px;line-height:1.8">' +
         '8 张来自商品详情页自动抓取<br>1 段 BGM 来自 SuperX 正版曲库<br>其余空镜由 AI 生成</p>';
       panel('settings').innerHTML =
-        row('平台', ['抖音*', '视频号', '小红书']) + row('时长', ['15s', '15–30s*', '60s']) +
+        row('平台', ['TikTok*', 'Instagram Reels', 'YouTube Shorts']) + row('时长', ['15s', '15–30s*', '60s']) +
         row('口播风格', ['痛点式*', '测评式', '故事式']) + row('音色', ['温柔女声*', '活力女声', '沉稳男声']) +
         row('字幕', ['简约白*', '描边黄', '综艺花字']) + row('批量', ['3 条', '5 条*', '10 条', '30 条']) +
         '<div class="sec-label">额度</div><p class="dim" style="font-size:12.5px;line-height:1.8">' +
@@ -628,12 +678,12 @@
     var TINTS = [['#2A1240', '#120A1E'], ['#331750', '#150B22'], ['#251038', '#0F0818']];
 
     var CHARS = [
-      { name: '林晚', role: '女主', face: '#A855F7', voice: '清冷女声', locked: true,
-        bio: '26 岁，律所合伙人，外冷内热。三年前替沈舟背下一纸合约。' },
-      { name: '沈舟', role: '男主', face: '#6C4CF5', voice: '低沉男声', locked: true,
+      { name: 'Maya', role: '女主', face: '#A855F7', voice: '清冷女声', locked: true,
+        bio: '26 岁，律所合伙人，外冷内热。三年前替 Arga 背下一纸合约。' },
+      { name: 'Arga', role: '男主', face: '#0B62CE', voice: '低沉男声', locked: true,
         bio: '30 岁，重生归来的落魄总裁。记得前世的每一次背叛。' },
-      { name: '周伯', role: '配角', face: '#F59E0B', voice: '苍老男声', locked: false,
-        bio: '沈家旧仆，唯一察觉沈舟"变了"的人。' }
+      { name: 'Pak Yusuf', role: '配角', face: '#F59E0B', voice: '苍老男声', locked: false,
+        bio: 'Wijaya 家旧仆，唯一察觉 Arga"变了"的人。' }
     ];
 
     // 每集剧本：t 为该行起始秒
@@ -641,46 +691,46 @@
       1: { dur: 130, lines: [
         { t: 0,  k: 'scene', v: '【场景】律所会议室 · 日 · 逆光' },
         { t: 6,  k: 'move',  v: '【运镜】长焦压缩，越过玻璃隔断推进' },
-        { t: 14, k: 'name',  v: '林晚', l: '「沈先生，这份合约我不会签。」', note: '（情绪：克制｜停顿 0.5s）' },
-        { t: 30, k: 'move',  v: '【运镜】反打，沈舟指节敲击桌面三下' },
-        { t: 40, k: 'name',  v: '沈舟', l: '「你会的。三年前你就签过一次。」', note: '（情绪：笃定）' },
-        { t: 60, k: 'name',  v: '林晚', l: '「……你说什么？」', note: '（情绪：错愕｜语速 -15%）' },
-        { t: 78, k: 'move',  v: '【运镜】特写，林晚瞳孔收缩' },
+        { t: 14, k: 'name',  v: 'Maya', l: '「Arga 先生，这份合约我不会签。」', note: '（情绪：克制｜停顿 0.5s）' },
+        { t: 30, k: 'move',  v: '【运镜】反打，Arga 指节敲击桌面三下' },
+        { t: 40, k: 'name',  v: 'Arga', l: '「你会的。三年前你就签过一次。」', note: '（情绪：笃定）' },
+        { t: 60, k: 'name',  v: 'Maya', l: '「……你说什么？」', note: '（情绪：错愕｜语速 -15%）' },
+        { t: 78, k: 'move',  v: '【运镜】特写，Maya 瞳孔收缩' },
         { t: 96, k: 'scene', v: '【转场】白闪，切前世记忆片段' },
         { t: 112, k: 'hook', v: '【钩子】他为什么知道三年前的事？' }
       ] },
       2: { dur: 145, lines: [
-        { t: 0,  k: 'scene', v: '【场景】沈氏顶层办公室 · 黄昏' },
+        { t: 0,  k: 'scene', v: '【场景】Wijaya 集团顶层办公室 · 黄昏' },
         { t: 8,  k: 'move',  v: '【运镜】环绕镜头，落地窗城市天际线' },
-        { t: 18, k: 'name',  v: '沈舟', l: '「合约条款我改过了，你再看一遍。」' },
-        { t: 34, k: 'name',  v: '林晚', l: '「你把违约责任全揽到自己身上了。」', note: '（情绪：疑惑）' },
-        { t: 52, k: 'name',  v: '沈舟', l: '「这一次，我不想再让你替我赔。」', note: '（情绪：低沉｜停顿 1.2s）' },
+        { t: 18, k: 'name',  v: 'Arga', l: '「合约条款我改过了，你再看一遍。」' },
+        { t: 34, k: 'name',  v: 'Maya', l: '「你把违约责任全揽到自己身上了。」', note: '（情绪：疑惑）' },
+        { t: 52, k: 'name',  v: 'Arga', l: '「这一次，我不想再让你替我赔。」', note: '（情绪：低沉｜停顿 1.2s）' },
         { t: 74, k: 'move',  v: '【运镜】双人中景，光线渐暗' },
-        { t: 92, k: 'name',  v: '周伯', l: '「少爷，太太生前也是这么说的。」' },
-        { t: 114, k: 'hook', v: '【钩子】周伯到底知道多少？' }
+        { t: 92, k: 'name',  v: 'Pak Yusuf', l: '「少爷，夫人生前也是这么说的。」' },
+        { t: 114, k: 'hook', v: '【钩子】Pak Yusuf 到底知道多少？' }
       ] },
       3: { dur: 150, lines: [
         { t: 0,  k: 'scene', v: '【场景】老宅门口 · 夜 · 大雨' },
         { t: 7,  k: 'move',  v: '【运镜】低角度推近，雨滴打在伞面' },
-        { t: 16, k: 'name',  v: '林晚', l: '「你以为把合同撕了，这事就算完了？」', note: '（情绪：压抑的愤怒｜停顿 0.8s）' },
-        { t: 38, k: 'move',  v: '【运镜】过肩反打，沈舟背身' },
-        { t: 48, k: 'name',  v: '沈舟', l: '「合同是我签的，撕的也该是我。」' },
-        { t: 68, k: 'name',  v: '林晚', l: '「三年前你也是这么说的。」', note: '（情绪：讥讽｜语速 +10%）' },
+        { t: 16, k: 'name',  v: 'Maya', l: '「你以为把合同撕了，这事就算完了？」', note: '（情绪：压抑的愤怒｜停顿 0.8s）' },
+        { t: 38, k: 'move',  v: '【运镜】过肩反打，Arga 背身' },
+        { t: 48, k: 'name',  v: 'Arga', l: '「合同是我签的，撕的也该是我。」' },
+        { t: 68, k: 'name',  v: 'Maya', l: '「三年前你也是这么说的。」', note: '（情绪：讥讽｜语速 +10%）' },
         { t: 90, k: 'move',  v: '【运镜】双人中景，雨势加大' },
-        { t: 104, k: 'name', v: '沈舟', l: '「这次不一样。」', note: '（情绪：决绝）' },
+        { t: 104, k: 'name', v: 'Arga', l: '「这次不一样。」', note: '（情绪：决绝）' },
         { t: 124, k: 'scene', v: '【转场】雨幕虚化，切 EP04' },
         { t: 136, k: 'hook',  v: '【钩子】他手里那张旧照片是谁？' }
       ] }
     };
 
     var OUTLINE = [
-      '律所初见，林晚拒签合约，沈舟说出三年前的秘密',
-      '沈舟改了违约条款，周伯一句话暴露了前世',
+      '律所初见，Maya 拒签合约，Arga 说出三年前的秘密',
+      'Arga 改了违约条款，Pak Yusuf 一句话暴露了前世',
       '雨夜老宅对峙，旧照片第一次出现',
-      '林晚查到照片来源，指向已故的沈母',
-      '前世记忆碎片回闪，沈舟第一次说出"重来"',
-      '董事会逼宫，林晚当庭反转',
-      '沈舟主动离场，把股权交给林晚',
+      'Maya 查到照片来源，指向已故的 Arga 母亲',
+      '前世记忆碎片回闪，Arga 第一次说出"重来"',
+      '董事会逼宫，Maya 当庭反转',
+      'Arga 主动离场，把股权交给 Maya',
       '半年后机场重逢，两人都变了'
     ];
 
@@ -701,7 +751,7 @@
         '</div>' +
         '<div class="empty-label">或者看看已经做出来的（点开能看到完整对话，含原始 prompt）：</div>' +
         '<div class="sample-row">' +
-          [['都市情感 · 20 集', '#2C1840,#140B1E'], ['古风穿越 · 24 集', '#3A2418,#1A1208'],
+          [['都市情感 · 20 集', '#2C1840,#140B1E'], ['豪门恩怨 · 24 集', '#3A2418,#1A1208'],
            ['悬疑推理 · 16 集', '#16283F,#0B1220'], ['重生逆袭 · 30 集', '#3F1630,#1A0A16']].map(function (x) {
             return '<button class="sample"><div class="cov" style="background:linear-gradient(160deg,' + x[1] + ')"></div><div class="nm">' + x[0] + '</div></button>';
           }).join('') +
@@ -722,7 +772,7 @@
 
     function renderParams(host) {
       host.innerHTML =
-        row('题材', ['都市情感*', '古风穿越', '悬疑推理', '重生逆袭']) +
+        row('题材', ['都市情感*', '豪门恩怨', '悬疑推理', '重生逆袭']) +
         row('集数', ['12 集', '20 集*', '24 集', '30 集']) +
         row('每集时长', ['1–2 分钟', '2–3 分钟*', '3–5 分钟']) +
         row('版式', ['竖屏 9:16*', '横屏 16:9', '双版都要']) +
@@ -743,7 +793,7 @@
       var s2 = addStep(b, '生成人物小传',
         '<div class="tool"><b>🔧 build_characters</b> count=8</div>' +
         '<div class="res">→ 3 主角 + 5 配角，含身份、动机、前史与人物弧光</div>' +
-        '<div class="tool"><b>🔧 lock_appearance</b> chars=林晚,沈舟</div>' +
+        '<div class="tool"><b>🔧 lock_appearance</b> chars=Maya,Arga</div>' +
         '<div class="res">→ 每人生成 4 张参考图（正/侧/笑/怒），跨集复用</div>');
       await sleep(1500); if (state.abort) return stopped();
       s2.done(16);
@@ -757,7 +807,7 @@
       s3.done(22);
 
       say(b, '按「重生复仇 + 双向救赎」的主线写了 <b>20 集大纲</b>，三个主角五个配角，每集结尾都留了钩子。' +
-             '林晚和沈舟的形象我已经<b>锁定</b>了，后面所有集都会沿用同一组参考图，不会跑脸。');
+             'Maya 和 Arga 的形象我已经<b>锁定</b>了，后面所有集都会沿用同一组参考图，不会跑脸。');
       await sleep(320);
       add(b, '<div class="tool-call"><span class="sp">✦</span> 剧本生成 <span class="ok">✓</span></div>');
 
@@ -836,7 +886,7 @@
       var warn = add(b,
         '<div class="fail-card" style="border-color:rgba(245,200,76,.35);background:rgba(245,200,76,.05)">' +
         '<div class="fh" style="color:var(--warn)">⚠ EP02 有一处需要你确认</div><div class="fb">' +
-        '<div class="row"><span class="dim">问题：</span>周伯那句「太太生前也是这么说的」口型与台词偏差 0.3 秒，我已经自动重配了一次。</div>' +
+        '<div class="row"><span class="dim">问题：</span>Pak Yusuf 那句「夫人生前也是这么说的」口型与台词偏差 0.3 秒，我已经自动重配了一次。</div>' +
         '<div class="row"><span class="dim">影响：</span>片子可以用，但如果你对口型要求严格，建议听一遍。</div>' +
         '<div class="acts"><button data-w="play">去听这一句</button><button data-w="re">重配这一句</button><button data-w="ok">就这样，继续</button></div>' +
         '</div></div>');
@@ -853,7 +903,7 @@
       report(b, n + ' 集已生成', [
         '时长：2:10 / 2:25 / 2:30',
         '版式：竖屏 9:16（横屏版可在设置里一并导出）',
-        '角色一致性：林晚、沈舟跨 3 集检查通过',
+        '角色一致性：Maya、Arga 跨 3 集检查通过',
         'EP02 有一处口型提示，见上方'
       ], n);
 
@@ -1040,7 +1090,7 @@
       panel('script').innerHTML = emptyBox('📄', '还没有剧本。<br>说一句设定，我先写人物和分集大纲。');
       panel('cast').innerHTML = emptyBox('👤', '还没有角色。');
       panel('settings').innerHTML =
-        row('题材', ['都市情感*', '古风穿越', '悬疑推理', '重生逆袭']) +
+        row('题材', ['都市情感*', '豪门恩怨', '悬疑推理', '重生逆袭']) +
         row('集数', ['12 集', '20 集*', '24 集', '30 集']) +
         row('每集时长', ['1–2 分钟', '2–3 分钟*', '3–5 分钟']) +
         row('版式', ['竖屏 9:16*', '横屏 16:9', '双版都要']) +

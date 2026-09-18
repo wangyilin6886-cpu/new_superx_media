@@ -35,7 +35,7 @@
   if (collage) {
     var palettes = [
       ['#FF5A6E', '9:16'], ['#A855F7', '16:9'], ['#34D399', '4:3'], ['#F59E0B', '3:2'],
-      ['#6C4CF5', '9:16'], ['#22D3EE', '16:9']
+      ['#0B62CE', '9:16'], ['#12B5C0', '16:9']
     ];
     var cols = window.innerWidth < 768 ? 4 : 8;
     for (var c = 0; c < cols; c++) {
@@ -238,8 +238,8 @@
   /* ---------- 屏 10 · 客户 Logo 墙 ---------- */
   var track = $('#logoTrack');
   if (track) {
-    var names = ['NOVA', 'Lumen', '星野文化', 'Driftly', '橙子科技', 'PEAK', '云溪教育', 'Mirage',
-                 'HALO', '未名传媒', 'Volta', 'Kite'];
+    var names = ['NOVA', 'Lumen', 'Sentra', 'Driftly', 'Kirana', 'PEAK', 'Nusantara', 'Mirage',
+                 'HALO', 'Arka', 'Volta', 'Kite'];
     var build = function () {
       names.forEach(function (n) {
         var el = document.createElement('span');
@@ -278,4 +278,19 @@
     });
   });
 
+})();
+
+/* ============================================================
+   已登录时，导航右上角换成「进入工作台」
+   ============================================================ */
+(function () {
+  var a = document.getElementById('navAuth');
+  if (!a || !window.SuperXAuth) return;
+  var u = window.SuperXAuth.get();
+  if (!u) return;
+  a.textContent = u.name;
+  a.href = 'studio.html';
+  a.classList.remove('muted');
+  var cta = a.nextElementSibling;
+  if (cta) { cta.textContent = '进入工作台'; cta.href = 'studio.html'; }
 })();

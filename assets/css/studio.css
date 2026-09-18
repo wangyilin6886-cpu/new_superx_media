@@ -16,9 +16,9 @@
   --text-2: #A6A8B8;
   --text-3: #6B6D80;
 
-  --violet: #6C4CF5;
-  --cyan: #22D3EE;
-  --grad: linear-gradient(100deg, #6C4CF5 0%, #22D3EE 100%);
+  --violet: #0B62CE;
+  --cyan: #12B5C0;
+  --grad: linear-gradient(100deg, #0B62CE 0%, #12B5C0 100%);
 
   --p1: #FF5A6E;
   --p2: #A855F7;
@@ -94,8 +94,8 @@ body.nav-collapsed.side-collapsed .app { grid-template-columns: 0px 1fr 0px; }
   overflow: hidden; min-width: 0;
 }
 .nav-head { height: var(--top-h); display: flex; align-items: center; gap: 10px; padding: 0 14px; flex: none; }
-.logo { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; letter-spacing: -0.02em; }
-.logo .mark { width: 17px; height: 17px; border-radius: 5px; background: var(--grad); transform: rotate(45deg); }
+.logo { display: inline-flex; align-items: center; min-width: 0; }
+.logo img { height: 13px; width: auto; display: block; }
 .icon-btn {
   width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
   color: var(--text-3); transition: all .18s var(--ease); flex: none;
@@ -741,3 +741,44 @@ body.nav-open .scrim { opacity: 1; visibility: visible; }
 @media (max-width: 768px) {
   .eps { grid-template-columns: repeat(5, 1fr); }
 }
+
+/* ============================================================
+   登录态：左栏底部 + 未登录拦截弹窗
+   ============================================================ */
+.avatar-txt {
+  display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #0B0B10;
+}
+.signin-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  height: 36px; border-radius: 9px; background: var(--grad); color: #fff;
+  font-weight: 600; font-size: 13px; transition: filter .18s, transform .18s var(--ease);
+}
+.signin-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.nav-foot .anon { font-size: 12px; color: var(--text-3); line-height: 1.6; margin-bottom: 10px; }
+.signout { font-size: 12px; color: var(--text-3); padding: 4px 8px; border-radius: 6px; }
+.signout:hover { color: var(--text-1); background: rgba(255,255,255,.06); }
+
+.modal-scrim {
+  position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px;
+  background: rgba(0,0,0,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; visibility: hidden; transition: all .24s var(--ease);
+}
+.modal-scrim.on { opacity: 1; visibility: visible; }
+.modal {
+  width: 100%; max-width: 420px; padding: 28px; border-radius: 18px;
+  border: 1px solid var(--line-strong); background: var(--ink-700);
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+  transform: translateY(10px); transition: transform .24s var(--ease);
+}
+.modal-scrim.on .modal { transform: none; }
+.modal h3 { font-size: 19px; margin-bottom: 10px; }
+.modal p { font-size: 13.5px; color: var(--text-2); line-height: 1.75; }
+.modal .acts { display: grid; gap: 9px; margin-top: 22px; }
+.modal .acts a, .modal .acts button {
+  display: flex; align-items: center; justify-content: center; height: 42px;
+  border-radius: 11px; font-size: 14px; font-weight: 600; transition: all .18s var(--ease);
+}
+.modal .acts .go { background: var(--grad); color: #fff; }
+.modal .acts .go:hover { filter: brightness(1.1); }
+.modal .acts .later { border: 1px solid var(--line); color: var(--text-2); font-weight: 500; }
+.modal .acts .later:hover { background: rgba(255,255,255,.06); color: var(--text-1); }

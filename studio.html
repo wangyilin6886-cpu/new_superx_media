@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/studio.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='5' transform='rotate(45 16 16)' fill='%23FF5A6E'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='5' transform='rotate(45 16 16)' fill='%230B62CE'/></svg>">
 </head>
 <body data-mode="video">
 
@@ -20,7 +20,7 @@
   <!-- ============ 左栏 ============ -->
   <aside class="nav" id="nav">
     <div class="nav-head">
-      <a href="index.html" class="logo"><span class="mark"></span>SuperX</a>
+      <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="SUPERX INDO"></a>
       <div style="flex:1"></div>
       <button class="icon-btn" id="navToggle" aria-label="折叠侧栏" title="折叠侧栏">⊟</button>
     </div>
@@ -47,31 +47,22 @@
       <div data-files hidden>
         <button class="chat-item"><span class="t">门店探店合集</span><span class="time">上周</span></button>
       </div>
-      <button class="tree-folder" data-folder><span class="tw">▸</span>📁 双十一</button>
+      <button class="tree-folder" data-folder><span class="tw">▸</span>📁 11.11 大促</button>
       <div data-files hidden>
         <button class="chat-item"><span class="t">预售期素材</span><span class="time">9月2日</span></button>
       </div>
 
       <div class="nav-label">最近</div>
       <button class="chat-item" style="padding-left:8px"><span class="t">小猫测试</span><span class="time">3天前</span></button>
-      <button class="chat-item" style="padding-left:8px"><span class="t">618 复盘</span><span class="time">上周</span></button>
+      <button class="chat-item" style="padding-left:8px"><span class="t">9.9 大促复盘</span><span class="time">上周</span></button>
 
       <div style="margin-top:18px">
         <a class="back-site" href="index.html">← 返回官网</a>
       </div>
     </div>
 
-    <div class="nav-foot">
-      <div class="user-row">
-        <div class="avatar"></div>
-        <div style="min-width:0">
-          <div style="font-size:13px;font-weight:500">张某某</div>
-          <div class="dim" style="font-size:11px">免费版 · 12/20 额度</div>
-        </div>
-      </div>
-      <div class="quota"><i></i></div>
-      <button class="upgrade">🚀 升级到创作者</button>
-    </div>
+    <div class="nav-foot" id="navFoot"></div>
+
   </aside>
 
   <!-- ============ 中栏 ============ -->
@@ -138,6 +129,7 @@
 <button class="side-handle" id="sideOpen" title="展开工作台">◀</button>
 <div class="toast" id="toast"></div>
 
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/studio.js"></script>
 </body>
 </html>

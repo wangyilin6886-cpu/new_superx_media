@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>登录 · SUPERX INDO</title>
+<meta name="description" content="登录 SUPERX INDO，开始用 AI 生产短视频、短剧、课程与应用。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/login.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='5' transform='rotate(45 16 16)' fill='%230B62CE'/></svg>">
+</head>
+<body>
+
+<div class="auth">
+
+  <!-- 左：品牌面 -->
+  <aside class="auth-brand">
+    <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="SUPERX INDO"></a>
+
+    <div class="pitch">
+      <h1>一句话，生成<br><span class="grad-text">一整条内容生产线</span></h1>
+      <p class="sub">同一套 AI 引擎，覆盖短视频、短剧、课程与应用四条生产线。</p>
+
+      <ul class="auth-points">
+        <li><i class="dot" style="background:var(--p1)"></i>一个商品链接，批量产出可投放的竖屏短视频</li>
+        <li><i class="dot" style="background:var(--p2)"></i>一句梗概生成分集剧本，角色跨集不跑脸</li>
+        <li><i class="dot" style="background:var(--p3)"></i>上传大纲，课件、讲课视频、练习题一次生成</li>
+        <li><i class="dot" style="background:var(--p4)"></i>说人话造应用，一键部署，可导出源码</li>
+      </ul>
+    </div>
+
+    <div class="foot">
+      新账号赠 20 条免费额度，无需信用卡 · <a href="index.html">回到官网</a>
+    </div>
+  </aside>
+
+  <!-- 右：表单面 -->
+  <main class="auth-panel">
+    <div class="auth-top">
+      <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="SUPERX INDO"></a>
+      <a href="index.html">← 回到官网</a>
+    </div>
+
+    <div class="auth-card">
+
+      <!-- 登录 / 注册 -->
+      <section class="view on" id="viewAuth">
+        <div class="seg-tabs" id="segTabs" role="tablist">
+          <button class="on" data-view="in" role="tab" aria-selected="true">登录</button>
+          <button data-view="up" role="tab" aria-selected="false">注册</button>
+        </div>
+
+        <h2 id="authTitle">欢迎回来</h2>
+        <p class="lead muted" id="authLead">登录后继续你的创作。</p>
+
+        <div class="form-note" id="note"></div>
+
+        <form id="authForm" novalidate>
+          <div class="field" id="fName" hidden>
+            <label for="name">你的名字</label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="Dewi Saputra">
+            <div class="msg">请填写名字</div>
+          </div>
+
+          <div class="field" id="fEmail">
+            <label for="email">工作邮箱</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com">
+            <div class="msg">请填写有效的邮箱地址</div>
+          </div>
+
+          <div class="field" id="fPass">
+            <label for="password">密码</label>
+            <div class="wrap-in">
+              <input id="password" name="password" type="password" autocomplete="current-password" class="has-peek" placeholder="至少 8 位">
+              <button type="button" class="peek" id="peek" aria-label="显示密码">显示</button>
+            </div>
+            <div class="msg">密码至少 8 位</div>
+          </div>
+
+          <div class="row-between" id="rowIn">
+            <label class="check">
+              <input type="checkbox" id="remember" checked>
+              <span class="box">✓</span> 记住我
+            </label>
+            <a href="#" class="link-sm" id="toForgot">忘记密码？</a>
+          </div>
+
+          <div class="row-between" id="rowUp" hidden>
+            <label class="check">
+              <input type="checkbox" id="agree">
+              <span class="box">✓</span> 我已阅读并同意服务条款
+            </label>
+          </div>
+
+          <button class="btn btn-primary" id="submitBtn" type="submit">登录</button>
+        </form>
+
+        <div class="divider">或</div>
+
+        <div class="oauth">
+          <button type="button" data-oauth="Google">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.6z"/>
+              <path fill="#34A853" d="M12 24c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.3 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v3C3.7 21.4 7.6 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.6 14.7a7.2 7.2 0 0 1 0-4.6v-3H1.8a12 12 0 0 0 0 10.6l3.8-3z"/>
+              <path fill="#EA4335" d="M12 4.8c1.7 0 3.2.6 4.4 1.7l3.3-3.3C17.7 1.2 15.1 0 12 0 7.6 0 3.7 2.6 1.8 6.1l3.8 3C6.5 6.7 9 4.8 12 4.8z"/>
+            </svg>
+            使用 Google 继续
+          </button>
+          <button type="button" data-oauth="Apple">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+              <path d="M16.4 12.8c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.7 2.5 3 2.4 1.2 0 1.6-.8 3.1-.8 1.4 0 1.8.8 3.1.8 1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.5-1-2.5-3.9zM14 4.8c.7-.8 1.1-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/>
+            </svg>
+            使用 Apple 继续
+          </button>
+        </div>
+
+        <p class="legal">
+          继续即表示你同意 <a href="#">服务条款</a> 与 <a href="#">隐私政策</a>。
+        </p>
+      </section>
+
+      <!-- 忘记密码 -->
+      <section class="view" id="viewForgot">
+        <h2>重置密码</h2>
+        <p class="lead muted">填写注册邮箱，我们会发一条重置链接过去。</p>
+
+        <form id="forgotForm" novalidate>
+          <div class="field" id="fReset">
+            <label for="resetEmail">工作邮箱</label>
+            <input id="resetEmail" type="email" autocomplete="email" placeholder="you@company.com">
+            <div class="msg">请填写有效的邮箱地址</div>
+          </div>
+          <button class="btn btn-primary" id="resetBtn" type="submit">发送重置链接</button>
+        </form>
+
+        <p class="legal"><a href="#" id="backToLogin">← 回到登录</a></p>
+      </section>
+
+      <!-- 重置已发送 -->
+      <section class="view" id="viewSent">
+        <div class="ok-state">
+          <div class="ico">✓</div>
+          <h2>邮件已发出</h2>
+          <p class="lead muted" style="margin:10px auto 0">
+            重置链接已发送到 <b id="sentTo" style="color:var(--text-1)"></b>，24 小时内有效。
+          </p>
+          <p class="legal" style="margin-top:28px">
+            没收到？<a href="#" id="resend">重新发送</a> · <a href="#" id="backToLogin2">回到登录</a>
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/login.js"></script>
+</body>
+</html>
